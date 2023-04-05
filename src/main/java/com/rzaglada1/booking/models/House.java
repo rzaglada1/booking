@@ -46,6 +46,9 @@ public class House {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User user;
 
+    @OneToMany (mappedBy="house", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<OrderHistory> orderHistoryList;
+
 
     @PrePersist
     private void init () {
@@ -59,6 +62,8 @@ public class House {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", dateCreate=" + dateCreate +
+                ", dataBooking=" + dataBooking +
+                ", numDaysBooking=" + numDaysBooking +
 //                ", address=" + address + '\n' +
 //                ", feedback=" + feedbackList + '\n' +
                 '}' +'\n';

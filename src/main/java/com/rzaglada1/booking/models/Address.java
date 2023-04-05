@@ -21,6 +21,7 @@ public class Address {
     private String city;
     private String street;
     private String number;
+    private String apartment;
 
     private LocalDateTime dateCreate;
 
@@ -40,6 +41,7 @@ public class Address {
                 ", city='" + city + '\'' +
                 ", street='" + street + '\'' +
                 ", number='" + number + '\'' +
+                ", apartment='" + apartment + '\'' +
                 ", dateCreate=" + dateCreate +
                 '}';
     }

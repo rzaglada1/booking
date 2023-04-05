@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +32,7 @@ public class UserService {
     }
 
     public void deleteById(long id) {
+        System.out.println("delete 12124124 ");
         repository.delete(repository.getReferenceById(id));
     }
 
@@ -51,10 +53,30 @@ public class UserService {
             userUpdate.setFirstName(user.getFirstName());
             userUpdate.setLastName(user.getLastName());
             userUpdate.setPhone(user.getPhone());
-            userUpdate.setPassword(user.getPassword());
+            if (isTruePassword(id, user.getPasswordOld())) {
+                userUpdate.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
 
             repository.save(userUpdate);
         }
+    }
+
+
+    public User getUserByPrincipal (Principal principal) {
+        User user = new User();
+        if (principal != null) {
+                user = repository.findByEmail(principal.getName());
+        }
+        return user;
+    }
+
+    private Boolean isTruePassword(Long id, String password) {
+        boolean isCheck = false;
+        if (repository.findById(id).isPresent()) {
+            isCheck = passwordEncoder.matches(password, repository.findById(id).get().getPassword());
+        }
+        System.out.println("11111111 " + isCheck);
+        return isCheck;
     }
 
 }

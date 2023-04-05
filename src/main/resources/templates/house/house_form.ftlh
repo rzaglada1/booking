@@ -25,7 +25,7 @@
 >
 
     <form method="post"
-          action="/houses<#if house.id??>/${house.id?c}</#if>" enctype="multipart/form-data" class="w-75">
+          action="/houses<#if house??>/${house.id?c}</#if>" enctype="multipart/form-data" class="w-75">
 
 
         <div class="row">
@@ -40,7 +40,7 @@
                             id="floatingName"
                             name="name"
                             placeholder="Назва"
-                            <#if house.name??>
+                            <#if house??>
                                 value="${house.name}"
                             </#if>
                     />
@@ -55,11 +55,7 @@
                             class="form-control"
                             id="floatingDescription"
                             name="description"
-                            placeholder="Опис житла">
-                        <#if house.description??>
-                            ${house.description}
-                        </#if>
-                        </textarea>
+                            placeholder="Опис житла"><#if house??>${house.description}</#if></textarea>
                 </div>
 
                 <div class="form-check mb-2">
@@ -69,8 +65,10 @@
                             id="floatingAvailable"
                             name="isAvailable"
 
-                            <#if house.isAvailable??>
+                            <#if house??>
                                 <#if house.isAvailable == true>checked</#if>
+                                <#else>
+                                checked
                             </#if>
 
                     />
@@ -84,7 +82,7 @@
                             class="form-control"
                             id="numTourists"
                             name="numTourists"
-                            <#if house.numTourists??>
+                            <#if house??>
                                 value="${house.numTourists}"
                             </#if>
                             placeholder="Кількість місць"
@@ -100,7 +98,7 @@
                             class="form-control"
                             id="price"
                             name="price"
-                            <#if house.price??>
+                            <#if house??>
                                 value="${house.price}"
                             </#if>
                             placeholder="Ціна бронювання"
@@ -145,6 +143,7 @@
 
                 <div class="row">
                     <div class="col">
+                        <div class="form-floating mb-2">
                         <input
                                 type="text"
                                 maxlength="50"
@@ -153,10 +152,12 @@
                                 <#if address.street??>
                                     value="${address.street}"
                                 </#if>
-                                placeholder="Вулиця"
-                        />
+                                placeholder="Вулиця"/>
+                        <label for="floatingStreet1">Вулиця</label>
+                        </div>
                     </div>
                     <div class="col">
+                        <div class="form-floating mb-2">
                         <input
                                 type="text"
                                 maxlength="50"
@@ -165,8 +166,25 @@
                                 <#if address.number??>
                                     value="${address.number}"
                                 </#if>
-                                placeholder="Номер будівлі"
+                                placeholder="Будинок"
                         />
+                            <label for="floatingNumber1">Будинок</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating mb-2">
+                        <input
+                                type="text"
+                                maxlength="50"
+                                class="form-control"
+                                name="apartment"
+                                <#if address.apartment??>
+                                    value="${address.apartment}"
+                                </#if>
+                                placeholder="Квартира"
+                        />
+                            <label for="floatingApartment1">Квартира</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -177,8 +195,12 @@
                 <label for="file"><b>Фото</b></label>
                 <input name="file" type="file"
                        accept=".png, .jpg, .jpeg" class="form-control">
-                <#if house.image?? >
-                    <img src="/images/${house.image.getId()}">
+                <#if house??>
+                    <#if house.image??>
+                    <img src="/images/${house.image.getId()}" alt="No photo">
+                    <#else>
+                    <img src="" alt="No photo">
+                    </#if>
                 </#if>
             </div>
 
@@ -188,7 +210,7 @@
 
             <div class="d-flex justify-content-between">
                 <button type="submit" class="btn btn-success"><b>Зберегти</b></button>
-                <a href="" class="btn btn-danger"><b>Відмінити</b></a>
+                <a href="/houses" class="btn btn-danger"><b>Відмінити</b></a>
             </div>
 
         </div>

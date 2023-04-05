@@ -3,14 +3,15 @@ package com.rzaglada1.booking.controllers;
 
 import com.rzaglada1.booking.models.Address;
 import com.rzaglada1.booking.models.House;
-import com.rzaglada1.booking.services.AddressService;
 import com.rzaglada1.booking.services.HouseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
+import java.security.Principal;
 
 
 @Controller
@@ -18,13 +19,12 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class HouseController {
     private final HouseService houseService;
-    private final AddressService addressService;
 
 
     // request form all  house
     @GetMapping
     public String houseAll(Model model) {
-        houseService.getAll().forEach(System.out::println);
+        //houseService.getAll().forEach(System.out::println);
         model.addAttribute("houses", houseService.getAll());
         return "house/house_list";
     }
@@ -32,24 +32,26 @@ public class HouseController {
     // request form new  house
     @GetMapping("/new")
     public String houseNew(Model model) {
-        model.addAttribute("house", new House());
+        model.addAttribute("house", null);
         model.addAttribute("address", new Address());
 //        model.addAttribute("image", new Image());
-        return "house/house_edit";
+        return "house/house_form";
     }
+
 
     // create new house
     @PostMapping
     public String house(@RequestParam(value = "file", required = false) MultipartFile file
             , House house
             , Address address
+            , Principal principal
     ) {
         try {
-            houseService.saveToBase(house, address, file);
+            houseService.saveToBase(principal, house, address, file);
         } catch (IOException e) {
             System.out.println("Something wrong");
         }
-        return "user/user_new";
+        return "redirect:/houses";
     }
 
     // update house
@@ -67,7 +69,7 @@ public class HouseController {
         } catch (IOException e) {
             System.out.println("Something wrong");
         }
-        return "house/house_new";
+        return "redirect:/houses";
     }
 
     // request form edit house by id
@@ -77,7 +79,22 @@ public class HouseController {
             model.addAttribute("house", houseService.getById(id).get());
             model.addAttribute("address", houseService.getById(id).get().getAddress());
         }
-        return "house/house_edit";
+        return "house/house_form";
+    }
+
+    @GetMapping("/{id}/delete")
+    public String houseDelete(@PathVariable("id") Long id) {
+        houseService.deleteById(id);
+
+        return "redirect:/houses";
+    }
+
+    @GetMapping("/{id}/detail")
+    public String houseDetail(@PathVariable("id") Long id, Model model) {
+        if (houseService.getById(id).isPresent()) {
+            model.addAttribute("house", houseService.getById(id).get());
+        }
+        return "house/house_detail";
     }
 
 

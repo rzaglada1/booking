@@ -6,10 +6,8 @@ import com.rzaglada1.booking.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+
 
 @SpringBootApplication
 public class BookingApplication {
@@ -18,15 +16,17 @@ public class BookingApplication {
     static HouseService houseService;
     static UserService userService;
     static FeedbackService feedbackService;
+    static OrderService orderService;
 
     @Autowired
     public BookingApplication(AddressService addressService, HouseService restaurantService
-            , UserService userService, FeedbackService feedbackService
+            , UserService userService, FeedbackService feedbackService, OrderService orderService
     ) {
         this.addressService = addressService;
         BookingApplication.houseService = restaurantService;
         this.userService = userService;
         this.feedbackService = feedbackService;
+        this.orderService = orderService;
     }
 
     public static void main(String[] args) {
@@ -45,6 +45,7 @@ public class BookingApplication {
         //feedbackService.deleteById(403);
         //userService.deleteById(54);
 
+        //createOrderHistory();
 
         //System.out.println(userService.getById(2).get().getEmail());
         //System.out.println(userService.getAll().get(1).getId());
@@ -76,6 +77,13 @@ public class BookingApplication {
         feedback.setUser(userService.getById(2).get());
 
         feedbackService.saveToBase(feedback);
+    }
+
+    static void createOrderHistory() {
+        OrderHistory orderHistory = new OrderHistory();
+        orderHistory.setHouse(houseService.getById(102).get());
+        orderHistory.setUser(userService.getById(2).get());
+        orderService.saveToBase(orderHistory);
     }
 
 

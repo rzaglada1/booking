@@ -19,7 +19,7 @@ public class Feedback {
 
     private String name;
     private String description;
-
+    private double score;
     private LocalDateTime dateCreate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

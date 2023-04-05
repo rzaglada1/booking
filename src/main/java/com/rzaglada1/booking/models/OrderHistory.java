@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -17,15 +18,20 @@ public class OrderHistory {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
 
-    double price;
+    private double price;
+
+    private LocalDate dataBooking;
+    private int numDaysBooking;
+    private int numTourists;
+
 
     private LocalDateTime dateCreate;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    User user;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    private User user;
 
-    @OneToOne
-    House house;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    private House house;
 
     @PrePersist
     private void init () {

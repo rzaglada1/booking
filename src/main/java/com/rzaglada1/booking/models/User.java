@@ -34,12 +34,15 @@ public class User implements UserDetails {
     private String password;
     @Transient
     private String passwordConfirm;
+    @Transient
+    private String passwordOld;
+
     private boolean active;
 
     private LocalDateTime dateCreate;
 
     @OneToMany ( mappedBy="user", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<OrderHistory> orderHistory;
+    private List<OrderHistory> orderHistoryList;
 
     @OneToMany(mappedBy="user", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Feedback> feedbackList;
