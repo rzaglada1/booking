@@ -25,7 +25,6 @@
         .no-border-radius {
             border-radius: 0;
         }
-        .b
     </style>
     <title>Form</title>
 </head>
@@ -39,7 +38,7 @@
                 <a href="/" class="h2 text-dark" style="margin-right: 20px"
                 >My booking.com</a
                 >
-                <#if user.email??>
+                <#if user?? && user.email??>
                 <ul
                         class="nav col-12 col-lg-auto mb-2 justify-content-start align-items-center mb-md-0 float-md-end"
                 >
@@ -47,16 +46,22 @@
                         <a href="/houses" class="nav-link px-2 text-dark">Мої об'єкти</a>
                     </li>
                     <li class="h5">
-                        <a href="/houses/new" class="nav-link px-2 text-dark">Додати новий об'єкт</a>
+                        <a href="/houses/new" class="nav-link px-2 text-dark">Новий об'єкт</a>
+                    </li>
+                    <li class="h5">
+                        <a href="/wishes" class="nav-link px-2 text-dark">Список бажань</a>
+                    </li>
+                    <li class="h5">
+                        <a href="/orders/${user.id}" class="nav-link px-2 text-dark">Історія бронювань</a>
                     </li>
                 </ul>
                 </#if>
             </div>
 
             <div class="text-end">
-                <#if user.email??>
+                <#if user?? && user.email??>
                 <a
-                        href="/users/${user.id}/edit"
+                        href="/users/edit"
                         class="btn btn-outline-warning text-dark"
                         style="margin-right: 10px"
                 >Переглянути профіль</a
@@ -68,6 +73,11 @@
                         style="width: 70px"
                 >Вийти</a
                 >
+                    <#if admin??>
+                    <a href="/users" class="btn btn-outline-warning  text-dark"
+                    >Користувачі</a>
+                        </#if>
+
                 <#else>
                 <a href="/login" class="btn btn-outline-dark me-2">Увійти</a>
                 <a href="/users/new" class="btn btn-outline-warning text-dark"
@@ -148,10 +158,5 @@
     </footer>
 </div>
 
-<script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-        crossorigin="anonymous"
-></script>
 </body>
 </html>

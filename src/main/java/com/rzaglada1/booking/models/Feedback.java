@@ -18,8 +18,9 @@ public class Feedback {
     private long id;
 
     private String name;
+    @Column(columnDefinition = "text")
     private String description;
-    private double score;
+    private double rating;
     private LocalDateTime dateCreate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -28,10 +29,13 @@ public class Feedback {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User user;
 
+
+
     @PrePersist
     private void init() {
         dateCreate = LocalDateTime.now();
     }
+
 
     @Override
     public String toString() {

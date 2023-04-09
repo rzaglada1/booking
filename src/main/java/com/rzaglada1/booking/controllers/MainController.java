@@ -1,16 +1,14 @@
 package com.rzaglada1.booking.controllers;
 
-import com.rzaglada1.booking.services.AddressService;
+import com.rzaglada1.booking.models.enams.Role;
 import com.rzaglada1.booking.services.HouseService;
 import com.rzaglada1.booking.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
+
 
 import java.security.Principal;
 import java.time.LocalDate;
@@ -20,7 +18,6 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class MainController {
 
-    private final AddressService addressService;
     private final HouseService houseService;
     private final UserService userService;
 
@@ -33,7 +30,14 @@ public class MainController {
 
     @GetMapping("/")
     public String index(Model model, Principal principal) {
-        model.addAttribute("user", userService.getUserByPrincipal(principal));
+        if (userService.getUserByPrincipal(principal).getEmail() != null) {
+            model.addAttribute("user", userService.getUserByPrincipal(principal));
+            if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
+                model.addAttribute("admin", "admin");
+            }
+        } else if (userService.isEmpty()) {
+            return "redirect:/users/new";
+        }
 
         return "index";
     }

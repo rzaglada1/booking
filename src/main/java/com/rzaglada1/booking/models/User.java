@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
@@ -36,8 +35,12 @@ public class User implements UserDetails {
     private String passwordConfirm;
     @Transient
     private String passwordOld;
+    @Transient
+    private Role roleForm;
+    @Transient
+    private String activeForm;
 
-    private boolean active;
+    private Boolean active;
 
     private LocalDateTime dateCreate;
 

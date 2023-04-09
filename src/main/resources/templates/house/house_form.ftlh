@@ -63,7 +63,7 @@
                             type="checkbox"
                             class="form-check-input"
                             id="floatingAvailable"
-                            name="isAvailable"
+                            name="isAvailableForm"
 
                             <#if house??>
                                 <#if house.isAvailable == true>checked</#if>
@@ -96,14 +96,14 @@
                             min="0"
                             step="0.01"
                             class="form-control"
-                            id="price"
+                            id="priceF"
                             name="price"
                             <#if house??>
-                                value="${house.price}"
+                                value="${house.price?c}"
                             </#if>
                             placeholder="Ціна бронювання"
                     />
-                    <label for="price">Ціна бронювання</label>
+                    <label for="priceF">Ціна бронювання</label>
                 </div>
 
             </div>

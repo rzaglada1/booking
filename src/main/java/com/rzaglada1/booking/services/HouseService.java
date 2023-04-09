@@ -6,7 +6,6 @@ import com.rzaglada1.booking.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDate;
@@ -19,7 +18,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class HouseService {
-    private final HouseRepository repository;
+    private final HouseRepository repositoryHouse;
     private final UserRepository repositoryUser;
 
 
@@ -38,7 +37,15 @@ public class HouseService {
 
         // clear spase in description
         house.setDescription(house.getDescription().trim());
-        repository.save(house);
+        repositoryHouse.save(house);
+    }
+
+    public List<House> getHouseByUser (User user) {
+        return repositoryHouse.getHouseByUser(user);
+    }
+
+    public Optional<House> getHouseById (long id) {
+        return repositoryHouse.findById(id);
     }
 
     private User getUserByPrincipal(Principal principal) {
@@ -46,7 +53,7 @@ public class HouseService {
     }
 
     private List<House> getAllHouse() {
-        return repository.findAll();
+        return repositoryHouse.findAll();
     }
 
     private Image fileToImage(MultipartFile file, House house) throws IOException {
@@ -63,15 +70,15 @@ public class HouseService {
     }
 
     public void deleteById(long id) {
-        repository.delete(repository.getReferenceById(id));
+        repositoryHouse.delete(repositoryHouse.getReferenceById(id));
     }
 
     public List<House> getAll() {
-        return repository.findAll();
+        return repositoryHouse.findAll();
     }
 
     public Optional<House> getById(long id) {
-        return repository.findById(id);
+        return repositoryHouse.findById(id);
     }
 
 
@@ -114,103 +121,27 @@ public class HouseService {
             // set address
             houseUpdate.setAddress(addressUpdate);
 
-            repository.save(houseUpdate);
+            repositoryHouse.save(houseUpdate);
         }
     }
 
-    public List<House> filterHouses(String destination, LocalDate startDateBooking, int days, int people) {
+    public List<House> filterHouses(String destination, LocalDate date, int days, int people) {
         List<House> houses = getAllHouse();
 
 
-        if (destination != "-1" && !houses.isEmpty()) {
+        if (!destination.equals("-1") && !houses.isEmpty()) {
             houses = houseDestinationFilter(houses, destination);
         }
 
-//        if (!startDateBooking.isEqual(LocalDate.parse("1970-01-01")) && !houses.isEmpty()) {
-//            LocalDate endDateBooking = startDateBooking.plusDays(days);
-//
-//            System.out.println("startDateBooking " + startDateBooking);
-//            System.out.println("endDateBooking " + endDateBooking);
-//
-//                 houses = houses.stream().filter(h -> {
-//                     boolean flag = false;
-//                     LocalDate startDateHouse = LocalDate.parse("1960-01-01");
-//                     LocalDate endDateHouse = LocalDate.parse("1960-01-01");
-//
-//                     if (h.getDataBooking() != null) {
-//                         startDateHouse = h.getDataBooking();
-//                         endDateHouse = startDateHouse.plusDays(h.getNumDaysBooking());
-//                     }
-//
-//                     System.out.println("startDateHouse " + startDateHouse);
-//                     System.out.println("endDateHouse " + endDateHouse);
-//
-//                  if(endDateBooking.isBefore(startDateHouse)
-//                                   || endDateBooking.isEqual(startDateHouse)
-//                           || endDateHouse.isBefore(startDateBooking)
-//                                   || endDateHouse.isEqual(startDateBooking)
-//                  ) {
-//                      flag = true;
-//                  }
-//                     System.out.println("flag " + flag);
-//                  return flag;
-//                 } ).toList();
-//        }
+        if (!date.isEqual(LocalDate.parse("1970-01-01")) && !houses.isEmpty()) {
 
-
-        if (!startDateBooking.isEqual(LocalDate.parse("1970-01-01")) && !houses.isEmpty()) {
-
-            List<House> houseListTemp = new ArrayList<>();
-            LocalDate endDateBooking = startDateBooking.plusDays(days);
-
-            System.out.println("startDateBooking" + startDateBooking);
-            System.out.println("endDateBooking " + endDateBooking);
-
-            LocalDate startDateHouse;
-            LocalDate endDateHouse;
-
-            for (House house : houses) {
-                boolean flag = true;
-                for (OrderHistory orderHistory : house.getOrderHistoryList()) {
-                    if (orderHistory.getDataBooking() != null) {
-                        startDateHouse = orderHistory.getDataBooking();
-                        endDateHouse = startDateHouse.plusDays(orderHistory.getNumDaysBooking());
-                    } else {
-                         startDateHouse = LocalDate.parse("1960-01-01");
-                         endDateHouse = LocalDate.parse("1960-01-01");
-                    }
-
-
-                    if (endDateBooking.isBefore(startDateHouse)
-                            || endDateBooking.isEqual(startDateHouse)
-                            || endDateHouse.isBefore(startDateBooking)
-                            || endDateHouse.isEqual(startDateBooking)
-                    ) {
-                        flag = false;
-                    }
-
-                    System.out.println("startDateHouse " + startDateHouse);
-                    System.out.println("endDateHouse " + endDateHouse);
-
-                }
-                System.out.println("flag " + flag);
-                if (flag) {
-                    houseListTemp.add(house);
-                }
-
-
-
-            }
-            System.out.println("-------------------------");
-            houseListTemp.forEach(System.out::println);
-            System.out.println("-------------------------");
-
+            houses = dateFilter(houses, date, days);
 
         }
 
 
-        if (people != 0 && !houses.isEmpty()) {
-
+        if (people != 1 && !houses.isEmpty()) {
+            houses = houses.stream().filter(e->e.getNumTourists() >=people).toList();
         }
 
         houses.forEach(System.out::println);
@@ -223,7 +154,7 @@ public class HouseService {
 
 
     private List<House> houseDestinationFilter(List<House> houses, String destination) {
-        List<String> destinationSplit = Arrays.asList(destination.trim().split("[., ]"));
+        String[] destinationSplit = destination.trim().split("[., ]");
 
         List<House> housesTemp;
         // for country
@@ -296,6 +227,61 @@ public class HouseService {
 
         return houses;
     }
+
+    private List<House> dateFilter(List<House> houses, LocalDate startDateBooking, int days) {
+        List<House> houseListTemp = new ArrayList<>();
+        LocalDate endDateBooking = startDateBooking.plusDays(days);
+
+        System.out.println("startDateBooking" + startDateBooking);
+        System.out.println("endDateBooking " + endDateBooking);
+
+        LocalDate startDateHouse;
+        LocalDate endDateHouse;
+
+        for (House house : houses) {
+            boolean flag = false;
+            if (house.getOrderHistoryList().isEmpty()) {flag = true;}
+                for (OrderHistory orderHistory : house.getOrderHistoryList()) {
+                    flag = false;
+                    if (orderHistory.getDataBooking() != null) {
+                        startDateHouse = orderHistory.getDataBooking();
+                        endDateHouse = startDateHouse.plusDays(orderHistory.getNumDaysBooking());
+                    } else {
+                        startDateHouse = LocalDate.parse("1960-01-01");
+                        endDateHouse = LocalDate.parse("1960-01-01");
+                    }
+
+
+                    if (endDateBooking.isBefore(startDateHouse)
+                            || endDateBooking.isEqual(startDateHouse)
+                            || endDateHouse.isBefore(startDateBooking)
+                            || endDateHouse.isEqual(startDateBooking)
+                    ) {
+                        flag = true;
+                    } else {
+                        break;
+                    }
+
+                    System.out.println("startDateHouse " + startDateHouse);
+                    System.out.println("endDateHouse " + endDateHouse);
+                    System.out.println(flag);
+
+                }
+
+
+                System.out.println("flag " + flag);
+                if (flag) {
+                    houseListTemp.add(house);
+                }
+
+        }
+        System.out.println("-------------------------");
+        houseListTemp.forEach(System.out::println);
+        System.out.println("-------------------------");
+
+        return houseListTemp;
+    }
+
 
 
 }

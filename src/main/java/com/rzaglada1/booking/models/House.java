@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,14 +18,16 @@ public class House {
     private long id;
 
     private String name;
+    @Column(columnDefinition = "text")
     private String description;
     private int numTourists;
     private double price;
 
     private Boolean isAvailable;
+    @Transient
+    private String isAvailableForm;
 
-    private LocalDate dataBooking;
-    private int numDaysBooking;
+
 
     private LocalDateTime dateCreate;
 
@@ -40,8 +40,8 @@ public class House {
     @OneToMany (mappedBy="house", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Feedback> feedbackList;
 
-    @OneToOne (mappedBy="house", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Wish wish;
+    @OneToMany (mappedBy="house", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Wish> wishList;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User user;
@@ -49,6 +49,16 @@ public class House {
     @OneToMany (mappedBy="house", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderHistory> orderHistoryList;
 
+
+    public double getAverRating() {
+        return feedbackList.stream()
+                .mapToDouble(Feedback::getRating)
+                .average().orElse(-1);
+    }
+
+    public int getCountFeedback() {
+        return feedbackList.size();
+    }
 
     @PrePersist
     private void init () {
@@ -62,8 +72,6 @@ public class House {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", dateCreate=" + dateCreate +
-                ", dataBooking=" + dataBooking +
-                ", numDaysBooking=" + numDaysBooking +
 //                ", address=" + address + '\n' +
 //                ", feedback=" + feedbackList + '\n' +
                 '}' +'\n';

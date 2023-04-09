@@ -16,11 +16,11 @@ public class BookingApplication {
     static HouseService houseService;
     static UserService userService;
     static FeedbackService feedbackService;
-    static OrderService orderService;
+    static OrderHistoryService orderService;
 
     @Autowired
     public BookingApplication(AddressService addressService, HouseService restaurantService
-            , UserService userService, FeedbackService feedbackService, OrderService orderService
+            , UserService userService, FeedbackService feedbackService, OrderHistoryService orderService
     ) {
         this.addressService = addressService;
         BookingApplication.houseService = restaurantService;
@@ -71,17 +71,17 @@ public class BookingApplication {
 
     static void createFeedback() {
         Feedback feedback = new Feedback();
-        feedback.setHouse(houseService.getById(2).get());
+        feedback.setHouse(houseService.getById(102).get());
         feedback.setName("Feedback about Granit");
         feedback.setDescription("Some description ");
         feedback.setUser(userService.getById(2).get());
-
-        feedbackService.saveToBase(feedback);
+        feedback.setRating(9);
+       // feedbackService.saveToBase(feedback);
     }
 
     static void createOrderHistory() {
         OrderHistory orderHistory = new OrderHistory();
-        orderHistory.setHouse(houseService.getById(102).get());
+        orderHistory.setHouse(houseService.getById(2).get());
         orderHistory.setUser(userService.getById(2).get());
         orderService.saveToBase(orderHistory);
     }
@@ -113,9 +113,9 @@ public class BookingApplication {
         user3.getRoles().add(Role.ROLE_GUEST);
         user3.setPassword("1");
 
-        userService.saveToBase(user1);
-        userService.saveToBase(user2);
-        userService.saveToBase(user3);
+//        userService.saveToBase(user1);
+//        userService.saveToBase(user2);
+//        userService.saveToBase(user3);
 
     }
 
