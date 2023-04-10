@@ -44,14 +44,16 @@ public class MainController {
 
 
     @GetMapping("/find")
-    public String houseFind(@RequestParam(value = "destination", defaultValue = "-1") String destination
+    public String houseFind(
+              @RequestParam(value = "country", defaultValue = "-1") String country
+              ,@RequestParam(value = "city", defaultValue = "-1") String city
             , @RequestParam(value = "date", defaultValue = "1970-01-01") LocalDate date
             , @RequestParam(value = "days", defaultValue = "1") int days
             , @RequestParam(value = "people", defaultValue = "1") int people
                             , Model model
     ) {
 
-        model.addAttribute("houses", houseService.filterHouses(destination, date, days, people));
+        model.addAttribute("houses", houseService.filterHouses(country, city, date, days, people));
 
 
         return "house/house_list_filter" ;

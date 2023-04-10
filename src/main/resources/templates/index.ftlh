@@ -99,13 +99,26 @@
             <input
                     type="text"
                     class="form-control"
-                    id="destination"
-                    name="destination"
-                    placeholder="Куди ви хочете поїхати?"
+                    id="country"
+                    name="country"
+                    placeholder="Країна"
+                    style="border-radius: 0.25rem 0 0 0.25rem;"
+            />
+            <label class="text-dark" for="country"
+            >Країна</label
+            >
+        </div>
+        <div class="form-floating" style="width: 350px">
+            <input
+                    type="text"
+                    class="form-control"
+                    id="city"
+                    name="city"
+                    placeholder="Місто"
                     style="border-radius: 0.25rem 0 0 0.25rem;"
             />
             <label class="text-dark" for="destination"
-            >Куди ви хочете поїхати?</label
+            >Місто</label
             >
         </div>
         <div class="form-floating" style="width: 270px">

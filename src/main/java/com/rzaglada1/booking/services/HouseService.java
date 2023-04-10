@@ -1,6 +1,7 @@
 package com.rzaglada1.booking.services;
 
 import com.rzaglada1.booking.models.*;
+import com.rzaglada1.booking.repositories.AddressRepository;
 import com.rzaglada1.booking.repositories.HouseRepository;
 import com.rzaglada1.booking.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 public class HouseService {
     private final HouseRepository repositoryHouse;
     private final UserRepository repositoryUser;
+    private final AddressRepository repositoryAddress;
 
 
     public void saveToBase(Principal principal, House house, Address address, MultipartFile file) throws IOException {
@@ -125,12 +127,15 @@ public class HouseService {
         }
     }
 
-    public List<House> filterHouses(String destination, LocalDate date, int days, int people) {
+    //==============================================
+
+
+    public List<House> filterHouses(String country, String city, LocalDate date, int days, int people) {
         List<House> houses = getAllHouse();
 
 
-        if (!destination.equals("-1") && !houses.isEmpty()) {
-            houses = houseDestinationFilter(houses, destination);
+        if (!houses.isEmpty()) {
+            houses = houseDestinationFilter(houses, country, city);
         }
 
         if (!date.isEqual(LocalDate.parse("1970-01-01")) && !houses.isEmpty()) {
@@ -153,80 +158,63 @@ public class HouseService {
     }
 
 
-    private List<House> houseDestinationFilter(List<House> houses, String destination) {
-        String[] destinationSplit = destination.trim().split("[., ]");
+    private List<House> houseDestinationFilter(List<House> houses, String country, String city) {
+      //  String[] destinationSplit = destination.trim().split("[., ]");
 
         List<House> housesTemp;
         // for country
-        housesTemp = houses.stream().filter(house ->
-                {
-                    boolean isPresent = false;
-                    for (String s : destinationSplit) {
-                        if (house.getAddress().getCountry().toUpperCase().trim().contains(s.toUpperCase().trim())
-                                && s.toUpperCase().trim().length() != 0) {
+        if (!country.equals("-1") ) {
+            housesTemp = houses.stream().filter(house ->
+                    {
+                        boolean isPresent = false;
+
+                        if (house.getAddress().getCountry().toUpperCase().trim().contains(country.toUpperCase().trim())
+                                && country.toUpperCase().trim().length() != 0) {
                             isPresent = true;
-                            break;
                         } else {
                             isPresent = false;
                         }
-                    }
-                    return isPresent;
-                }
-        ).collect(Collectors.toList());
-        System.out.print("111 ");
 
-        if (!housesTemp.isEmpty()) {
-            houses = housesTemp;
+                        return isPresent;
+                    }
+            ).collect(Collectors.toList());
+            System.out.print("111 ");
+
+            if (!housesTemp.isEmpty()) {
+                houses = housesTemp;
+            }
+            housesTemp.forEach(System.out::println);
         }
-        housesTemp.forEach(System.out::println);
+
 
         // for city
-        housesTemp = houses.stream().filter(house ->
-                {
-                    boolean isPresent = true;
-                    for (String s : destinationSplit) {
-                        if (house.getAddress().getCity().toUpperCase().trim().contains(s.toUpperCase().trim())
-                                && s.toUpperCase().trim().length() != 0) {
+        if (!city.equals("-1") ) {
+            housesTemp = houses.stream().filter(house ->
+                    {
+                        boolean isPresent = true;
+
+                        if (house.getAddress().getCity().toUpperCase().trim().contains(city.toUpperCase().trim())
+                                && city.toUpperCase().trim().length() != 0) {
                             isPresent = true;
-                            break;
                         } else {
                             isPresent = false;
                         }
+
+                        return isPresent;
                     }
-                    return isPresent;
-                }
-        ).collect(Collectors.toList());
-        System.out.print("222 ");
-        housesTemp.forEach(System.out::println);
-        if (!housesTemp.isEmpty()) {
-            houses = housesTemp;
+            ).collect(Collectors.toList());
+            System.out.print("222 ");
+            housesTemp.forEach(System.out::println);
+            if (!housesTemp.isEmpty()) {
+                houses = housesTemp;
+            }
         }
 
-        // for street
-        housesTemp = houses.stream().filter(house ->
-                {
-                    boolean isPresent = false;
-                    for (String s : destinationSplit) {
-                        if (house.getAddress().getStreet().toUpperCase().trim().contains(s.toUpperCase().trim())
-                                && s.toUpperCase().trim().length() != 0) {
-                            isPresent = true;
-                            break;
-                        } else {
-                            isPresent = false;
-                        }
-                    }
-                    return isPresent;
-                }
-        ).collect(Collectors.toList());
-        System.out.print("333 ");
-        housesTemp.forEach(System.out::println);
-        System.out.println("========================");
-        if (!housesTemp.isEmpty()) {
-            houses = housesTemp;
-        }
+
 
         return houses;
     }
+
 
     private List<House> dateFilter(List<House> houses, LocalDate startDateBooking, int days) {
         List<House> houseListTemp = new ArrayList<>();
