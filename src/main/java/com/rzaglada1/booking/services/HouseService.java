@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,6 +21,7 @@ public class HouseService {
     private final HouseRepository repositoryHouse;
     private final UserRepository repositoryUser;
     private final AddressRepository repositoryAddress;
+
 
 
     public void saveToBase(Principal principal, House house, Address address, MultipartFile file) throws IOException {
@@ -130,145 +130,23 @@ public class HouseService {
     //==============================================
 
 
-    public List<House> filterHouses(String country, String city, LocalDate date, int days, int people) {
+    public List<House> filterHouses(String country, String city, LocalDate dateBookingStart, int days, int people) {
         List<House> houses = getAllHouse();
 
 
-        if (!houses.isEmpty()) {
-            houses = houseDestinationFilter(houses, country, city);
-        }
-
-        if (!date.isEqual(LocalDate.parse("1970-01-01")) && !houses.isEmpty()) {
-
-            houses = dateFilter(houses, date, days);
-
-        }
+        LocalDate dateBookingEnd = dateBookingStart.plusDays(days);
 
 
-        if (people != 1 && !houses.isEmpty()) {
-            houses = houses.stream().filter(e->e.getNumTourists() >=people).toList();
-        }
+        System.out.println("=====================");
+        System.out.println("dateBookingStart " + dateBookingStart);
+        System.out.println("dateBookingEnd " + dateBookingEnd);
+        repositoryHouse.getHouseByFilter(country, city, dateBookingStart,dateBookingEnd, people).forEach(System.out::println);
+        System.out.println("=======================");
 
-        houses.forEach(System.out::println);
-
-
-        System.out.println("1111111111111111111111111111111111111");
-
-        return houses;
+        return repositoryHouse.getHouseByFilter(country, city, dateBookingStart, dateBookingEnd.minusDays(1), people);
     }
 
 
-    private List<House> houseDestinationFilter(List<House> houses, String country, String city) {
-      //  String[] destinationSplit = destination.trim().split("[., ]");
-
-        List<House> housesTemp;
-        // for country
-        if (!country.equals("-1") ) {
-            housesTemp = houses.stream().filter(house ->
-                    {
-                        boolean isPresent = false;
-
-                        if (house.getAddress().getCountry().toUpperCase().trim().contains(country.toUpperCase().trim())
-                                && country.toUpperCase().trim().length() != 0) {
-                            isPresent = true;
-                        } else {
-                            isPresent = false;
-                        }
-
-                        return isPresent;
-                    }
-            ).collect(Collectors.toList());
-            System.out.print("111 ");
-
-            if (!housesTemp.isEmpty()) {
-                houses = housesTemp;
-            }
-            housesTemp.forEach(System.out::println);
-        }
-
-
-        // for city
-        if (!city.equals("-1") ) {
-            housesTemp = houses.stream().filter(house ->
-                    {
-                        boolean isPresent = true;
-
-                        if (house.getAddress().getCity().toUpperCase().trim().contains(city.toUpperCase().trim())
-                                && city.toUpperCase().trim().length() != 0) {
-                            isPresent = true;
-                        } else {
-                            isPresent = false;
-                        }
-
-                        return isPresent;
-                    }
-            ).collect(Collectors.toList());
-            System.out.print("222 ");
-            housesTemp.forEach(System.out::println);
-            if (!housesTemp.isEmpty()) {
-                houses = housesTemp;
-            }
-        }
-
-
-
-        return houses;
-    }
-
-
-    private List<House> dateFilter(List<House> houses, LocalDate startDateBooking, int days) {
-        List<House> houseListTemp = new ArrayList<>();
-        LocalDate endDateBooking = startDateBooking.plusDays(days);
-
-        System.out.println("startDateBooking" + startDateBooking);
-        System.out.println("endDateBooking " + endDateBooking);
-
-        LocalDate startDateHouse;
-        LocalDate endDateHouse;
-
-        for (House house : houses) {
-            boolean flag = false;
-            if (house.getOrderHistoryList().isEmpty()) {flag = true;}
-                for (OrderHistory orderHistory : house.getOrderHistoryList()) {
-                    flag = false;
-                    if (orderHistory.getDataBooking() != null) {
-                        startDateHouse = orderHistory.getDataBooking();
-                        endDateHouse = startDateHouse.plusDays(orderHistory.getNumDaysBooking());
-                    } else {
-                        startDateHouse = LocalDate.parse("1960-01-01");
-                        endDateHouse = LocalDate.parse("1960-01-01");
-                    }
-
-
-                    if (endDateBooking.isBefore(startDateHouse)
-                            || endDateBooking.isEqual(startDateHouse)
-                            || endDateHouse.isBefore(startDateBooking)
-                            || endDateHouse.isEqual(startDateBooking)
-                    ) {
-                        flag = true;
-                    } else {
-                        break;
-                    }
-
-                    System.out.println("startDateHouse " + startDateHouse);
-                    System.out.println("endDateHouse " + endDateHouse);
-                    System.out.println(flag);
-
-                }
-
-
-                System.out.println("flag " + flag);
-                if (flag) {
-                    houseListTemp.add(house);
-                }
-
-        }
-        System.out.println("-------------------------");
-        houseListTemp.forEach(System.out::println);
-        System.out.println("-------------------------");
-
-        return houseListTemp;
-    }
 
 
 

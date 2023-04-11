@@ -20,7 +20,8 @@ public class OrderHistory {
 
     private double price;
 
-    private LocalDate dataBooking;
+    private LocalDate dataBookingStart;
+    private LocalDate dataBookingEnd;
     private int numDaysBooking;
     private int numTourists;
 

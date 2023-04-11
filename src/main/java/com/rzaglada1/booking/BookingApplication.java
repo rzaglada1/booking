@@ -34,6 +34,7 @@ public class BookingApplication {
 
 //		creatingUsers();
 
+        //createOrderHistory();
 //		setupDataBase();
 //		setupDataBase();
 //		restaurantService.deleteById(1);
@@ -81,8 +82,8 @@ public class BookingApplication {
 
     static void createOrderHistory() {
         OrderHistory orderHistory = new OrderHistory();
-        orderHistory.setHouse(houseService.getById(2).get());
-        orderHistory.setUser(userService.getById(2).get());
+        orderHistory.setHouse(houseService.getById(1).get());
+        orderHistory.setUser(userService.getById(1).get());
         orderService.saveToBase(orderHistory);
     }
 
