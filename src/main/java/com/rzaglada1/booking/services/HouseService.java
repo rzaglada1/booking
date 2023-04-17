@@ -7,6 +7,7 @@ import com.rzaglada1.booking.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDate;
@@ -21,7 +22,6 @@ public class HouseService {
     private final HouseRepository repositoryHouse;
     private final UserRepository repositoryUser;
     private final AddressRepository repositoryAddress;
-
 
 
     public void saveToBase(Principal principal, House house, Address address, MultipartFile file) throws IOException {
@@ -42,11 +42,11 @@ public class HouseService {
         repositoryHouse.save(house);
     }
 
-    public List<House> getHouseByUser (User user) {
+    public List<House> getHouseByUser(User user) {
         return repositoryHouse.getHouseByUser(user);
     }
 
-    public Optional<House> getHouseById (long id) {
+    public Optional<House> getHouseById(long id) {
         return repositoryHouse.findById(id);
     }
 
@@ -131,23 +131,17 @@ public class HouseService {
 
 
     public List<House> filterHouses(String country, String city, LocalDate dateBookingStart, int days, int people) {
-        List<House> houses = getAllHouse();
-
-
         LocalDate dateBookingEnd = dateBookingStart.plusDays(days);
-
-
-        System.out.println("=====================");
-        System.out.println("dateBookingStart " + dateBookingStart);
-        System.out.println("dateBookingEnd " + dateBookingEnd);
-        repositoryHouse.getHouseByFilter(country, city, dateBookingStart,dateBookingEnd, people).forEach(System.out::println);
-        System.out.println("=======================");
-
         return repositoryHouse.getHouseByFilter(country, city, dateBookingStart, dateBookingEnd.minusDays(1), people);
     }
 
 
+    public boolean isDateFree(OrderHistory orderHistory, long houseId) {
+        LocalDate getDataBookingStart = orderHistory.getDataBookingStart();
+        LocalDate getDataBookingEnd = orderHistory.getDataBookingEnd();
+        int numTourist = orderHistory.getNumTourists();
 
-
-
+        return repositoryHouse.
+                getHouseByDate(getDataBookingStart, getDataBookingEnd.minusDays(1), numTourist, houseId).size() == 0;
+    }
 }

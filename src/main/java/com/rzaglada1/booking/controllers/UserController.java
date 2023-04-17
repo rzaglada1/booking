@@ -98,6 +98,8 @@ public class UserController {
     @GetMapping
     public String userList(Model model, Principal principal) {
         if (principal != null && userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
+            model.addAttribute("admin", "admin");
+            model.addAttribute("user", userService.getUserByPrincipal(principal));
             model.addAttribute("users", userService.getAll());
         }
         return "user/user_list";

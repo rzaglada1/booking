@@ -50,8 +50,16 @@ public class MainController {
             , @RequestParam(value = "date", defaultValue = "1970-01-01") LocalDate date
             , @RequestParam(value = "days", defaultValue = "1") int days
             , @RequestParam(value = "people", defaultValue = "1") int people
-                            , Model model
+                            , Model model,
+              Principal principal
     ) {
+
+        if (userService.getUserByPrincipal(principal).getEmail() != null) {
+            model.addAttribute("user", userService.getUserByPrincipal(principal));
+            if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
+                model.addAttribute("admin", "admin");
+            }
+        }
 
         model.addAttribute("houses", houseService.filterHouses(country, city, date, days, people));
 

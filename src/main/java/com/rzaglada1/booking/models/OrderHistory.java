@@ -4,9 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Data
 @AllArgsConstructor
@@ -20,9 +20,9 @@ public class OrderHistory {
 
     private double price;
 
-    private LocalDate dataBookingStart;
-    private LocalDate dataBookingEnd;
-    private int numDaysBooking;
+    private LocalDate dataBookingStart ;
+    private LocalDate dataBookingEnd ;
+    private long numDaysBooking;
     private int numTourists;
 
 
@@ -39,5 +39,9 @@ public class OrderHistory {
         dateCreate = LocalDateTime.now();
     }
 
-
+    public void setHouse(House house) {
+        this.house = house;
+        this.numDaysBooking = dataBookingStart.until(dataBookingEnd, ChronoUnit.DAYS);
+        this.price = house.getPrice() * this.numDaysBooking;
+    }
 }

@@ -1,27 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <meta
-            name="viewport"
-            content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
-    />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-            integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
-            crossorigin="anonymous"
-    />
-    <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-    />
-    <title>Edit house</title>
-</head>
-<body>
+<#import '../macros/head_footer.ftlh' as h>
+
+<@h.head>
+
+
 <main
-        class="form-signin text-center d-flex justify-content-center align-items-center view"
+        class="form-signin bg-dark text-center d-flex justify-content-center align-items-center view"
 >
 
     <form method="post"
@@ -72,7 +55,7 @@
                             </#if>
 
                     />
-                    <label for="floatingAvailable">Доступний для бронювання</label>
+                    <label class="text-light" for="floatingAvailable">Доступний для бронювання</label>
                 </div>
 
                 <div class="form-floating mb-2">
@@ -197,7 +180,7 @@
                        accept=".png, .jpg, .jpeg" class="form-control">
                 <#if house??>
                     <#if house.image??>
-                    <img src="/images/${house.image.getId()}" alt="No photo">
+                    <img class="m-5" src="/images/${house.image.getId()}" alt="No photo">
                     <#else>
                     <img src="" alt="No photo">
                     </#if>
@@ -209,7 +192,7 @@
             <br>
 
             <div class="d-flex justify-content-between">
-                <button type="submit" class="btn btn-success"><b>Зберегти</b></button>
+                <button type="submit" class="btn btn-warning"><b>Зберегти</b></button>
                 <a href="/houses" class="btn btn-danger"><b>Відмінити</b></a>
             </div>
 
@@ -217,11 +200,5 @@
     </form>
 </main>
 
-<script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-        crossorigin="anonymous"
-></script>
 
-</body>
-</html>
+</@h.head>

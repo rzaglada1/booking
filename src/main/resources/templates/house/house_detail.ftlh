@@ -1,183 +1,154 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <meta
-            name="viewport"
-            content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
-    />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-            integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
-            crossorigin="anonymous"
-    />
-    <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-    />
-    <style>
-        a {
-            text-decoration: none;
-            color: #000;
-        }
+<#import '../macros/head_footer.ftlh' as h>
 
-        .cardHr {
-            border: none;
-            width: 95%;
-            margin: auto;
-            height: 2px !important;
-            background-color: #fff;
-        }
+<@h.head>
 
-        .view {
-            width: 100%;
-            min-height: calc(100vh - 160px);
-        }
-
-        .abc {
-            padding-left: 40px;
-        }
-
-        .para {
-            float: right;
-            margin-right: 0;
-            padding-left: 80%;
-            top: 0;
-        }
-
-        li {
-            list-style: none;
-            line-height: 50px;
-        }
-
-        .col-md-2 a {
-            text-decoration: none;
-        }
-    </style>
-    <title>Form</title>
-</head>
-<body>
-
-<main
-        class="px-3 text-center text-white bg-dark d-flex align-items-center justify-content-center flex-column view"
->
-    <div class="container py-4 my-4 mx-auto d-flex flex-column">
-        <div class="header">
-            <div class="row justify-content-around">
-                <div class="col-md-9 abc">
-                    <h1>
-                        <#if house??>
-                            ${house.name}
-                        <#else>
-                            Назва
-                        </#if>
-                    </h1>
+    <main
+            class="px-3 text-center text-white bg-dark d-flex align-items-center justify-content-center flex-column view"
+    >
+        <div class="container py-4 my-4 mx-auto d-flex flex-column">
+            <div class="header">
+                <div class="row justify-content-around">
+                    <div class="col-md-9 abc">
+                        <h1>
+                            <#if house??>
+                                ${house.name}
+                            <#else>
+                                Назва
+                            </#if>
+                        </h1>
+                    </div>
+                    <div
+                            class="btn btn-secondary d-flex justify-content-center align-items-center fs-3 col-md-1 text-right"
+                    >
+                        <#if house.getAverRating() == -1>без оцінок<#else>${house.getAverRating()}</#if>
+                    </div>
+                    <p class="text-right para">
+                        <#if house.getCountFeedback() != 0>На основі ${house.getCountFeedback()} відгуків</#if></p>
                 </div>
-                <div
-                        class="btn btn-secondary d-flex justify-content-center align-items-center fs-3 col-md-1 text-right"
-                >
-                    <#if house.getAverRating() == -1>без оцінок<#else>${house.getAverRating()}</#if>
-                </div>
-                <p class="text-right para">
-                    <#if house.getCountFeedback() != 0>На основі ${house.getCountFeedback()} відгуків</#if></p>
             </div>
-        </div>
-        <div class="container-body mt-4">
-            <div class="row r3">
-                <div class="col-md-5">
-                    <#if house??>
-                        <#if house.image??>
-                            <img src="/images/${house.image.getId()}" alt="No photo" width="90%" height="95%">
-                        <#else>
-                            <img src="" alt="No photo">
+            <div class="container-body mt-4">
+                <div class="row">
+                    <div class="col-md-5">
+                        <#if house??>
+                            <#if house.image??>
+                                <img src="/images/${house.image.getId()}" alt="No photo" width="90%" height="95%">
+                            <#else>
+                                <img src="" alt="No photo">
+                            </#if>
                         </#if>
-                    </#if>
-                </div>
-                <div class="col-md-7 p-1 border rounded position-relative">
-                    <ul style="padding-left: 0">
-                        <li>Опис житла: <br><#if house??>${house.description}</#if>
-                            <hr align="center" class="cardHr">
-                        </li>
-                        <li>Адреса: <br>
-                            <#if house.address.country??>${house.address.country},</#if>
-                            <#if house.address.city??>${house.address.city},</#if>
-                            <#if house.address.street?has_content>вул.${house.address.street},</#if>
-                            <#if house.address.number?has_content>буд.${house.address.number},</#if>
-                            <#if house.address.apartment?has_content>кв.${house.address.apartment}.</#if>
-                            <hr class="cardHr">
-                        </li>
-                    </ul>
+                    </div>
+                    <div class="col-md-7 p-1 d-flex flex-column border rounded position-relative">
+                        <ul style="padding-left: 0; ">
+                            <li style="display: inline;font-weight: bold;">Опис житла:<br></li>
+                            <li style="display: inline;"><#if house??>${house.description}</#if>
+                                <hr align="center" class="cardHr">
+                            </li>
+                            <li style="display: inline;font-weight: bold;">Адреса:<br></li>
+                            <li style="display: inline;">
+                                <#if house.address.country??>${house.address.country},</#if>
+                                <#if house.address.city??>${house.address.city},</#if>
+                                <#if house.address.street?has_content>вул.${house.address.street},</#if>
+                                <#if house.address.number?has_content>буд.${house.address.number},</#if>
+                                <#if house.address.apartment?has_content>кв.${house.address.apartment}.</#if>
+                                <hr class="cardHr">
+                            </li>
+                        </ul>
+                        <div style="float: right; gap: 10px; margin-top: auto" class="d-flex align-items-center">
+                            <form action="/houses/${house.id}/prebooking" method="post">
 
-                    <div class="d-flex justify-content-center align-items-stretch mb-3" style="gap: 10px">
-                        <div class="form-floating">
-                            <input
-                                    type="date"
-                                    class="form-control"
-                                    id="date1"
-                                    name="date1"
-                            />
-                            <label class="text-dark" for="date1"
-                            >Дата заїзду</label
-                            >
-                        </div>
+                                <div class="d-flex justify-content-center align-items-stretch" style="gap: 10px">
+                                    <div class="form-floating">
+                                        <input
+                                                type="date"
+                                                class="form-control"
+                                                id="dateBookingStart"
+                                                name="dataBookingStart"
+                                        />
+                                        <label class="text-dark" for="dateBookingStart"
+                                        >Дата заїзду</label>
+                                    </div>
 
 
+                                    <div class="form-floating">
+                                        <input
+                                                type="date"
+                                                class="form-control"
+                                                id="dateBookingEnd"
+                                                name="dataBookingEnd"
+                                        />
+                                        <label class="text-dark" for="dateBookingEnd"
+                                        >Дата виїзду</label
+                                        >
+                                    </div>
+                                    <div class="form-floating">
+                                        <input
+                                                type="number"
+                                                min="1"
+                                                class="form-control"
+                                                id="numTourists"
+                                                name="numTourists"
+                                                value="2"
+                                        />
+                                        <label class="text-dark" for="numTourist"
+                                        >Кількість людей</label
+                                        >
+                                    </div>
+                                    <div class="form-floating">
+                                        <input type="submit" class="btn btn-warning h-100" value="Бронювати">
+                                    </div>
+                                </div>
+                            </form>
 
 
+                            <form style="float: right; height: 58px" action="/wishes/${house.id}/new" method="post">
+                                <input type="submit" class="btn btn-info h-100
 
-                        <div class="form-floating">
-                            <input
-                                    type="date"
-                                    class="form-control"
-                                    id="date2"
-                                    name="date2"
-                            />
-                            <label class="text-dark" for="date2"
-                            >Дата виїзду</label
-                            >
-                        </div>
-                        <div class="form-floating">
-                            <input
-                                    type="number"
-                                    min="1"
-                                    class="form-control"
-                                    id="people"
-                                    name="people"
-                            />
-                            <label class="text-dark" for="people"
-                            >Кількість людей</label
-                            >
-                        </div>
-                        <a class="btn btn-warning t-center" href="/houses/${house.id}/booking"
-                           style="line-height: 43px; height: 58px"
-                        >Бронювати</a>
-                        <form style="float: right" action="/wishes/${house.id}/new" method="post">
-                            <input type="submit" class="btn btn-info h-100
-
-                                   <#if user.email??>
+                                   <#if user??>
                                    <#if isWishList == true>
                                    disabled "
-                                   value="Вже в обраному"
-                            <#else>
-                                "
-                                value="Додати в обране"
-                            </#if>
-                            <#else>
-                                "
-                                value="Додати в обране"
-                            </#if>
-                            />
-                        </form>
+                                       value="Вже в обраному"
+                                <#else>
+                                    "
+                                    value="Додати в обране"
+                                </#if>
+                                <#else>
+                                    "
+                                    value="Додати в обране"
+                                </#if>
+                                />
+                            </form>
+                        </div>
 
                     </div>
 
                 </div>
+                <div class="row mt-5">
+                    <div class="col-md-5 border rounded position-relative" style="height: 200px; overflow-y: scroll">
+                        <ul style="padding-left: 0; ">
+                            <li class="mb-4" style="display: inline;font-weight: bold;">Календар доступності<br></li>
+                            <#if orders??>
+                                <#list orders as order>
+                                    <li style="display: inline;"> Заброньовано з: ${order.dataBookingStart}
+                                        до: ${order.dataBookingEnd}
+                                        <hr class="cardHr">
+                                    </li>
+                                </#list>
+                            <#else>
+                                <li style="display: inline;">
+                                    всі дати доступні
+                                    <hr class="cardHr">
+                                </li>
+                            </#if>
+
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="container" style="margin-top: 10rem">
-            <#if user.email??>
+
+
+        <div class="container">
+            <#if user??>
                 <form accept-charset="UTF-8" action="/feedbacks/${house.id}" method="post">
             <textarea
                     class="form-control animated"
@@ -198,7 +169,7 @@
                                 min="0"
                                 max="10"
                         />
-                        <button class="btn btn-success btn-lg" type="submit">
+                        <button class="btn btn-warning btn-lg" type="submit">
                             Зберегти
                         </button>
                     </div>
@@ -217,11 +188,10 @@
             </#list>
 
         </div>
+
+    </main>
+    <div>
+
     </div>
-</main>
-<div>
 
-</div>
-
-</body>
-</html>
+</@h.head>

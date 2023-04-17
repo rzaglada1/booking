@@ -31,4 +31,19 @@ public interface HouseRepository extends JpaRepository<House, Long> {
                                      @Param("numTourist")int numTourist
     );
 
+
+    @Query("SELECT h FROM House h " +
+            "WHERE " +
+            "h.id = :idHouse" +
+            " and h.numTourists >= :numTourist" +
+            " and h.id  in (" +
+            "SELECT oo.house.id FROM OrderHistory oo WHERE not" +
+            "(:endDateBooking < oo.dataBookingStart or  :startDateBooking >= oo.dataBookingEnd )) " +
+            "")
+    List<House> getHouseByDate (  @Param("startDateBooking")LocalDate startDateBooking,
+                                  @Param("endDateBooking")LocalDate endDateBooking,
+                                  @Param("numTourist")int numTourist,
+                                  @Param("idHouse")long idHouse
+    );
+
 }
