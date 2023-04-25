@@ -4,6 +4,8 @@ import com.rzaglada1.booking.models.User;
 import com.rzaglada1.booking.models.enams.Role;
 import com.rzaglada1.booking.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -50,8 +52,8 @@ public class UserService {
     }
 
 
-    public List<User> getAll() {
-        return userRepository.findAll();
+    public Page<User> getAll(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     public Optional<User> getById(long id) {

@@ -3,9 +3,14 @@ package com.rzaglada1.booking.controllers;
 import com.rzaglada1.booking.models.User;
 import com.rzaglada1.booking.models.enams.Role;
 import com.rzaglada1.booking.services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.Arrays;
@@ -25,10 +30,33 @@ public class UserController {
     }
 
     // create new User
+//    @PostMapping
+//    public String users(@Valid User user, BindingResult bindingResult, Model model) {
+//        if (bindingResult.hasErrors()) {
+//
+//        }
+//        if (!user.getPassword().equals(user.getPasswordConfirm())) {
+//            model.addAttribute("errorMessage", " ");
+//            model.addAttribute("errorMessagePass", "Паролі не співпадають");
+//            return "user/user_form";
+//        }
+//
+//        if (!userService.saveToBase(user)) {
+//            model.addAttribute("errorMessage", " ");
+//            model.addAttribute("errorMessageDouble", "Користувач з таким email вже існує");
+//            user.setEmail(null);
+//            model.addAttribute("user", user);
+//            return "user/user_form";
+//        }
+//
+//        return "redirect:/";
+//    }
+
     @PostMapping
-    public String users(User user, Model model) {
-        System.out.println(user.getPassword());
-        System.out.println(user.getPasswordConfirm());
+    public String users(@Valid User user, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+
+        }
         if (!user.getPassword().equals(user.getPasswordConfirm())) {
             model.addAttribute("errorMessage", " ");
             model.addAttribute("errorMessagePass", "Паролі не співпадають");
@@ -38,11 +66,14 @@ public class UserController {
         if (!userService.saveToBase(user)) {
             model.addAttribute("errorMessage", " ");
             model.addAttribute("errorMessageDouble", "Користувач з таким email вже існує");
+            user.setEmail(null);
+            model.addAttribute("user", user);
             return "user/user_form";
         }
 
         return "redirect:/";
     }
+
 
     // update user
     @PostMapping(value = {"/update", "/update/{id}"})
@@ -96,11 +127,15 @@ public class UserController {
     }
 
     @GetMapping
-    public String userList(Model model, Principal principal) {
+    public String userList(Model model, Principal principal, @PageableDefault( size = 3, page = 0) Pageable pageable) {
         if (principal != null && userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
             model.addAttribute("admin", "admin");
             model.addAttribute("user", userService.getUserByPrincipal(principal));
-            model.addAttribute("users", userService.getAll());
+
+            Page<User> userPage;
+            userPage = userService.getAll(pageable);
+            model.addAttribute("page", userPage);
+            model.addAttribute("url", "/users");
         }
         return "user/user_list";
     }

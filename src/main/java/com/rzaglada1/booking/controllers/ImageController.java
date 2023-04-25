@@ -35,28 +35,4 @@ public class ImageController {
         return responseEntity;
     }
 
-    // for test, delete me
-    @PostMapping
-    public String imageToBase (@RequestParam("file") MultipartFile file) {
-        try {
-            System.out.println("111111111111");
-            Image image = new Image();
-            image.setName(file.getName());
-            image.setFileName(file.getOriginalFilename());
-            image.setContentType(file.getContentType());
-            image.setSize(file.getSize());
-            image.setPhotoToBytes(file.getBytes());
-
-
-            System.out.println(file.getSize());
-            System.out.println(houseService.getById(1));
-            image.setHouse(houseService.getById(1).get());
-            houseService.getById(1).get().setImage(image);
-            System.out.println("22222222");
-            imageRepository.save(image);
-        } catch (IOException e) {
-            System.out.println("Something wrong");
-        }
-        return "user/user_new";
-    }
-}
+ }

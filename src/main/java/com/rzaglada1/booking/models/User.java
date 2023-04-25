@@ -2,9 +2,12 @@ package com.rzaglada1.booking.models;
 
 import com.rzaglada1.booking.models.enams.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
@@ -24,16 +27,35 @@ public class User implements UserDetails {
     private long id;
 
 
-    private String firstName;
-    private String lastName;
     @Column(unique = true)
+    @Email(message = "Не вірний формат email")
+    @NotBlank(message = "Це поле не повинно бути порожнім")
+    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
     private String email;
+
+    @NotBlank(message = "Це поле не повинно бути порожнім")
+    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
+    private String firstName;
+
+    @NotBlank(message = "Це поле не повинно бути порожнім")
+    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
+    private String lastName;
+
+    @NotBlank(message = "Це поле не повинно бути порожнім")
+    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
     private String phone;
+
     @Column(name = "password", length = 1000)
+    @NotBlank(message = "Це поле не повинно бути порожнім")
+    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
     private String password;
     @Transient
+    @NotBlank(message = "Це поле не повинно бути порожнім")
+    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
     private String passwordConfirm;
     @Transient
+    @NotBlank(message = "Це поле не повинно бути порожнім")
+    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
     private String passwordOld;
     @Transient
     private Role roleForm;

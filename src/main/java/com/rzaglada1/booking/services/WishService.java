@@ -6,6 +6,8 @@ import com.rzaglada1.booking.repositories.HouseRepository;
 import com.rzaglada1.booking.repositories.UserRepository;
 import com.rzaglada1.booking.repositories.WishRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -18,8 +20,8 @@ public class WishService {
     private final UserRepository userRepository;
     private final HouseRepository houseRepository;
 
-    public List<Wish> getWishByUser (Principal principal) {
-        return wishRepository.getWishByUser(getUserByPrincipal(principal));
+    public Page<Wish> getWishByUser (Principal principal, Pageable pageable) {
+        return wishRepository.getWishByUser(getUserByPrincipal(principal), pageable);
     }
 
     public void saveToBase (Wish wish, long houseId, Principal principal) {

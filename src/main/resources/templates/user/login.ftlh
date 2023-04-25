@@ -27,6 +27,12 @@
         </div>
 
 
+        <div class="form-floating mb-4">
+                <#if errorMessage??>
+                    <p class="text-danger">${errorMessage}</p>
+                </#if>
+        </div>
+
 
         <button class="w-100 btn btn-lg btn-warning" type="submit">Sign in</button>
 

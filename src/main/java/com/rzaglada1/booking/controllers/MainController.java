@@ -1,17 +1,25 @@
 package com.rzaglada1.booking.controllers;
 
+import com.rzaglada1.booking.models.House;
 import com.rzaglada1.booking.models.enams.Role;
 import com.rzaglada1.booking.services.HouseService;
 import com.rzaglada1.booking.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.util.List;
 
 
 @Controller
@@ -23,7 +31,10 @@ public class MainController {
 
 
     @GetMapping("/login")
-    public String login() {
+    public String login(Model model, @RequestParam(name = "error", required = false) String message) {
+        if (message != null) {
+            model.addAttribute("errorMessage", "Не вірний пароль або користувач");
+        }
         return "user/login";
     }
 
@@ -43,15 +54,17 @@ public class MainController {
     }
 
 
+
     @GetMapping("/find")
     public String houseFind(
-              @RequestParam(value = "country", defaultValue = "%") String country
-              ,@RequestParam(value = "city", defaultValue = "%") String city
+            @RequestParam(value = "country", defaultValue = "%") String country
+            ,@RequestParam(value = "city", defaultValue = "%") String city
             , @RequestParam(value = "date", defaultValue = "1970-01-01") LocalDate date
             , @RequestParam(value = "days", defaultValue = "1") int days
             , @RequestParam(value = "people", defaultValue = "1") int people
-                            , Model model,
-              Principal principal
+            , Model model
+            , Principal principal
+            , @PageableDefault( size = 3, page = 0) Pageable pageable
     ) {
 
         if (userService.getUserByPrincipal(principal).getEmail() != null) {
@@ -60,11 +73,23 @@ public class MainController {
                 model.addAttribute("admin", "admin");
             }
         }
+        Page<House> housePage;
+        housePage = houseService.filterHouses(country, city, date, days, people,pageable);
+        model.addAttribute("page", housePage);
 
-        model.addAttribute("houses", houseService.filterHouses(country, city, date, days, people));
 
+        model.addAttribute("url", "/find?country=" + country
+                + "&city=" + city + "&date=" + date + "&days=" + days + "&people=" + people);
+
+        if (housePage.getTotalElements() == 0) {
+            model.addAttribute("message", "Нічого не знайдено. Спробуйте змінити критерії пошуку.");
+            return "/message";
+        }
 
         return "house/house_list_filter" ;
     }
+
+
+
 
 }

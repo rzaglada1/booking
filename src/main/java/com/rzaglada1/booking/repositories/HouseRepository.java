@@ -2,6 +2,8 @@ package com.rzaglada1.booking.repositories;
 
 import com.rzaglada1.booking.models.House;
 import com.rzaglada1.booking.models.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,11 +12,15 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface HouseRepository extends JpaRepository<House, Long> {
-    List<House> getHouseByUser (User user);
+    Page<House> getHouseByUser (User user, Pageable pageable);
+
+    Page<House> findAll (Pageable pageable);
 
 
-    @Query("SELECT h FROM House h " +
-            "left join Address a on h.id=a.house.id " +
+
+
+    @Query("SELECT DISTINCT h FROM House h " +
+            "join Address a on h.id=a.house.id " +
             "left join OrderHistory o on h.id=o.house.id " +
             "WHERE " +
             "h.numTourists >= :numTourist" +
@@ -24,11 +30,12 @@ public interface HouseRepository extends JpaRepository<House, Long> {
             "SELECT oo.house.id FROM OrderHistory oo WHERE not" +
             "(:endDateBooking < oo.dataBookingStart or  :startDateBooking >= oo.dataBookingEnd ))" +
             "")
-    List<House> getHouseByFilter (@Param("country") String country,
+    Page<House> getHouseByFilter (@Param("country") String country,
                                      @Param("city") String city,
                                      @Param("startDateBooking")LocalDate startDateBooking,
                                      @Param("endDateBooking")LocalDate endDateBooking,
-                                     @Param("numTourist")int numTourist
+                                     @Param("numTourist")int numTourist,
+                                     Pageable pageable
     );
 
 

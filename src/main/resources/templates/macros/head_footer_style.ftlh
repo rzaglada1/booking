@@ -22,7 +22,7 @@
     <style>
         .view {
             width: 100%;
-            height: calc(100vh - 90px);
+            min-height: calc(100vh - 90px);
             /*height: 100%;*/
         }
         .no-border-radius {

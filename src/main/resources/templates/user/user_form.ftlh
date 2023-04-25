@@ -1,9 +1,9 @@
-<#import '../macros/head_footer.ftlh' as h>
+<#import '../macros/head_footer_style.ftlh' as hs>
 
-<@h.head>
+<@hs.headStyle>
 
 <main>
-    <div class="card-body bg-dark d-flex justify-content-center  ">
+    <div class="card-body bg-dark d-flex justify-content-center  view">
 
 
 
@@ -146,7 +146,7 @@
                         </label>
                     </div>
                 <#else>
-                    <div class="form-floating mb-4">
+                    <div class="form-floating mb-4 text-light">
                         <#if user?? && !errorMessage??>
                             <#if user.active>active<#else>not active</#if>
                         </#if>
@@ -170,4 +170,4 @@
 
 </main>
 
-</@h.head>
+</@hs.headStyle>

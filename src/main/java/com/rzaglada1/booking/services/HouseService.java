@@ -5,6 +5,8 @@ import com.rzaglada1.booking.repositories.AddressRepository;
 import com.rzaglada1.booking.repositories.HouseRepository;
 import com.rzaglada1.booking.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,8 +44,8 @@ public class HouseService {
         repositoryHouse.save(house);
     }
 
-    public List<House> getHouseByUser(User user) {
-        return repositoryHouse.getHouseByUser(user);
+    public Page<House> getHouseByUser(User user, Pageable pageable) {
+        return repositoryHouse.getHouseByUser(user, pageable);
     }
 
     public Optional<House> getHouseById(long id) {
@@ -75,8 +77,8 @@ public class HouseService {
         repositoryHouse.delete(repositoryHouse.getReferenceById(id));
     }
 
-    public List<House> getAll() {
-        return repositoryHouse.findAll();
+    public Page<House> getAll(Pageable pageable) {
+        return repositoryHouse.findAll(pageable);
     }
 
     public Optional<House> getById(long id) {
@@ -130,10 +132,23 @@ public class HouseService {
     //==============================================
 
 
-    public List<House> filterHouses(String country, String city, LocalDate dateBookingStart, int days, int people) {
+    public Page<House> filterHouses(String country,
+                                    String city,
+                                    LocalDate dateBookingStart,
+                                    int days,
+                                    int people,
+                                    Pageable pageable
+    ) {
         LocalDate dateBookingEnd = dateBookingStart.plusDays(days);
-        return repositoryHouse.getHouseByFilter(country, city, dateBookingStart, dateBookingEnd.minusDays(1), people);
+        return repositoryHouse.getHouseByFilter(country,
+                city,
+                dateBookingStart,
+                dateBookingEnd.minusDays(1),
+                people,
+                pageable
+        );
     }
+
 
 
     public boolean isDateFree(OrderHistory orderHistory, long houseId) {

@@ -5,6 +5,8 @@ import com.rzaglada1.booking.models.OrderHistory;
 import com.rzaglada1.booking.models.User;
 import com.rzaglada1.booking.repositories.OrderHistoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -38,7 +40,7 @@ public class OrderHistoryService {
                 .toList();
     }
 
-    public List<OrderHistory> findOrdersByUser(User user) {
-        return orderHistoryRepository.findOrderHistoriesByUser(user);
+    public Page<OrderHistory> findOrdersByUser(User user, Pageable pageable) {
+        return orderHistoryRepository.findOrderHistoriesByUser(user, pageable);
         }
 }

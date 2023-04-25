@@ -1,4 +1,5 @@
 <#import '../macros/head_footer.ftlh' as h>
+<#import '../macros/pager.ftlh' as p>
 
 <@h.head>
 
@@ -8,7 +9,7 @@
         <div
                 class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 g-3"
         >
-            <#list wishes as wish>
+            <#list page.content as wish>
                 <div class="col">
 
                     <div class="card shadow-sm h-100">
@@ -105,6 +106,10 @@
                 </div>
             </#list>
         </div>
+    </div>
+
+    <div class="d-flex mt-5 justify-content-center" >
+        <@p.pager url page/>
     </div>
 
 </div>

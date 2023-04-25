@@ -10,6 +10,10 @@ import com.rzaglada1.booking.services.OrderHistoryService;
 import com.rzaglada1.booking.services.UserService;
 import com.rzaglada1.booking.services.WishService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -31,18 +35,35 @@ public class HouseController {
 
 
     // request form all  house
+
     @GetMapping
-    public String houseAll(Model model, Principal principal) {
-        if (principal != null && userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
-            model.addAttribute("houses", houseService.getAll());
-            model.addAttribute("admin", "admin");
-            model.addAttribute("user", userService.getUserByPrincipal(principal));
+    public String houseAll(Model model
+            , Principal principal
+            , @PageableDefault( sort = {"id"}, direction = Sort.Direction.ASC, size = 3, page = 0) Pageable pageable) {
+
+        Page<House> housePage;
+        if (principal != null) {
+            if( userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
+                housePage = houseService.getAll(pageable);
+                model.addAttribute("admin", "admin");
             } else {
-            model.addAttribute("houses", houseService.getHouseByUser(userService.getUserByPrincipal(principal)));
+                housePage = houseService.getHouseByUser(userService.getUserByPrincipal(principal), pageable);
+            }
+            model.addAttribute("houses", housePage);
+            model.addAttribute("page", housePage);
+            model.addAttribute("url", "/houses");
+
+            model.addAttribute("user", userService.getUserByPrincipal(principal));
+            if (housePage.getTotalElements() == 0) {
+                model.addAttribute("message", "Поки нічого не має.");
+                return "/message";
+            }
         }
+
 
         return "house/house_list";
     }
+
 
     // request form new  house
     @GetMapping("/new")
@@ -163,9 +184,6 @@ public class HouseController {
                 model.addAttribute("user", userService.getUserByPrincipal(principal));
                 model.addAttribute("isWishList", wishService.existsByHouseIdAndUser(houseId, principal));
             }
-
-
-
         }
         return "house/house_detail";
     }

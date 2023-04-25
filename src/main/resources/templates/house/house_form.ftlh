@@ -1,6 +1,6 @@
-<#import '../macros/head_footer.ftlh' as h>
+<#import '../macros/head_footer_style.ftlh' as hs>
 
-<@h.head>
+<@hs.headStyle>
 
 
 <main
@@ -201,4 +201,4 @@
 </main>
 
 
-</@h.head>
+</@hs.headStyle>

@@ -1,4 +1,5 @@
 <#import '../macros/head_footer.ftlh' as h>
+<#import '../macros/pager.ftlh' as p>
 
 <@h.head>
 
@@ -8,7 +9,7 @@
         <div
                 class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 g-3"
         >
-            <#list houses as house>
+            <#list page.content as house>
                 <div class="col">
 
                     <div class="card shadow-sm h-100">
@@ -88,11 +89,7 @@
                         </div>
 
                         <div class="d-flex flex-column btn-group text-center">
-<#--                            <a href="/houses/${house.id}/booking"-->
-<#--                                    class="btn fw-bold btn-sm btn-warning text-dark mb-1 mx-5 py-2 rounded "-->
-<#--                            >-->
-<#--                                Забронювати-->
-<#--                            </a>-->
+
                             <a href="/houses/${house.id}/detail"
                                     class="btn fw-bold btn-sm btn-success mb-3 mx-5 py-2 rounded"
                             >
@@ -105,7 +102,36 @@
             </#list>
         </div>
     </div>
+    <div class="d-flex mt-5 justify-content-center" >
+        <ul class="pagination ">
 
+            <li class="page-item disable ">
+                <#if page.number == 0>
+                    <a class="page-link" href="#">Попередня</a>
+                <#else >
+                    <a class="page-link" href="${url}&page=${page.number - 1}">Попередня</a>
+                </#if>
+            </li>
+
+            <li class="page-item disable">
+                <a class="page-link" href="#">${page.number+1}</a>
+            </li>
+            <li class="page-item disable">
+                <a class="page-link" href="#">/</a>
+            </li>
+            <li class="page-item disable">
+                <a class="page-link" href="#">${page.getTotalPages()}</a>
+            </li>
+
+            <li class="page-item disable">
+                <#if page.number+1 == page.totalPages>
+                    <a class="page-link" href="#">Наступна</a>
+                <#else >
+                    <a class="page-link" href="${url}&page=${page.number + 1}">Наступна</a>
+                </#if>
+            </li>
+        </ul>
+    </div>
 </div>
 
 
