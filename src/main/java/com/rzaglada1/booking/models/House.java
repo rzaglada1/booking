@@ -1,9 +1,15 @@
 package com.rzaglada1.booking.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,10 +23,19 @@ public class House {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
 
+    @NotBlank(message = "Це поле не повинно бути порожнім")
+    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
     private String name;
     @Column(columnDefinition = "text")
+    @NotBlank(message = "Це поле не повинно бути порожнім")
+    @Length(max = 50, message = "Довжина не повинна перевищувати 1000 символів")
     private String description;
+    @NotNull(message = "Це поле не повинно бути порожнім")
+    @Min(value = 1, message = "кількість від 1")
+    @Max( value = 50, message = "кількість до 50")
     private int numTourists;
+//    @NotBlank(message = "Це поле не повинно бути порожнім")
+@Min(value = 0, message = "ціна від 0")
     private double price;
 
     private Boolean isAvailable;

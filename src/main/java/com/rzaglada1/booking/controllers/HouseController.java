@@ -1,14 +1,10 @@
 package com.rzaglada1.booking.controllers;
 
 
-import com.rzaglada1.booking.models.Address;
-import com.rzaglada1.booking.models.House;
-import com.rzaglada1.booking.models.OrderHistory;
+import com.rzaglada1.booking.models.*;
 import com.rzaglada1.booking.models.enams.Role;
-import com.rzaglada1.booking.services.HouseService;
-import com.rzaglada1.booking.services.OrderHistoryService;
-import com.rzaglada1.booking.services.UserService;
-import com.rzaglada1.booking.services.WishService;
+import com.rzaglada1.booking.services.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,12 +12,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
-
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -32,6 +31,7 @@ public class HouseController {
     private final UserService userService;
     private final WishService wishService;
     private final OrderHistoryService orderHistoryService;
+    private final FeedbackService feedbackService;
 
 
     // request form all  house
@@ -82,63 +82,118 @@ public class HouseController {
     // create new house
     @PostMapping
     public String house(@RequestParam(value = "file", required = false) MultipartFile file
-            , House house
-            , Address address
+            , @Valid House house
+            , BindingResult bindingResultHouse
+            , @Valid Address address
+            , BindingResult bindingResultAddress
+            , Model model
             , Principal principal
     ) {
-        try {
-            //check is active
-            if (house.getIsAvailableForm() != null) {
-                house.setIsAvailable(true);
-            } else {
-                house.setIsAvailable(false);
+        model.addAttribute("new", " ");
+        //check is active
+        if (house.getIsAvailableForm() != null) {
+            house.setIsAvailable(true);
+        } else {
+            house.setIsAvailable(false);
+        }
+
+        if (bindingResultHouse.hasErrors()  || bindingResultAddress.hasErrors()) {
+
+            return getString(house, address, bindingResultHouse, bindingResultAddress, model);
+        }
+
+
+        else {
+            try {
+
+                houseService.saveToBase(principal, house, address, file);
+
+            } catch (IOException e) {
+                System.out.println("Something wrong");
             }
 
-            houseService.saveToBase(principal, house, address, file);
-        } catch (IOException e) {
-            System.out.println("Something wrong");
+            return "redirect:/houses";
         }
-        return "redirect:/houses";
     }
+
+    private String getString(@Valid House house, @Valid Address address
+            , BindingResult bindingResultHouse, BindingResult bindingResultAddress, Model model) {
+        Map<String, String> errorsMapHouse = bindingResultHouse.getFieldErrors().stream().collect(
+                Collectors.toMap(fieldError -> fieldError.getField() + "Error", FieldError::getDefaultMessage));
+
+        Map<String, String> errorsMapAddress = bindingResultAddress.getFieldErrors().stream().collect(
+                Collectors.toMap(fieldError -> fieldError.getField() + "Error", FieldError::getDefaultMessage));
+
+        model.addAttribute("errorMessage", " ");
+        model.mergeAttributes(errorsMapHouse);
+        model.mergeAttributes(errorsMapAddress);
+        model.addAttribute("house", house);
+        model.addAttribute("address", address);
+
+        errorsMapHouse.forEach((k,v)-> System.out.println(k+v));
+        errorsMapAddress.forEach((k,v)-> System.out.println(k+v));
+        return "house/house_form";
+    }
+
 
     // update house
     @PostMapping("/{id}")
     public String houseUpdate(
             @RequestParam(value = "file", required = false) MultipartFile file
-            , House house
-            , Address address
+            , @Valid House house
+            , BindingResult bindingResultHouse
+            , @Valid Address address
+            , BindingResult bindingResultAddress
+            , Model model
             , @PathVariable long id
             , Principal principal
     ) {
-        try {
-            //check is active
-            if (house.getIsAvailableForm() != null) {
-                house.setIsAvailable(true);
-            } else {
-                house.setIsAvailable(false);
-            }
-
-            if (principal != null && houseService.getById(id).isPresent()) {
-                if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
-                    houseService.update(house, address, file, id);
-                }
-                if (houseService.getHouseById(id).orElseThrow().getUser().equals(userService.getUserByPrincipal(principal))) {
-                    houseService.update(house, address, file, id);
-                }
-
-            }
-
-
-        } catch (IOException e) {
-            System.out.println("Something wrong");
+        model.addAttribute("edit", " ");
+        //check is active
+        if (house.getIsAvailableForm() != null) {
+            house.setIsAvailable(true);
+        } else {
+            house.setIsAvailable(false);
         }
-        return "redirect:/houses";
+
+        if (bindingResultHouse.hasErrors()  || bindingResultAddress.hasErrors()) {
+
+            return getString(house, address, bindingResultHouse, bindingResultAddress, model);
+        }
+
+
+        else {
+            try {
+                //check is active
+                if (house.getIsAvailableForm() != null) {
+                    house.setIsAvailable(true);
+                } else {
+                    house.setIsAvailable(false);
+                }
+
+                if (principal != null && houseService.getById(id).isPresent()) {
+                    if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
+                        houseService.update(house, address, file, id);
+                    }
+                    if (houseService.getHouseById(id).orElseThrow().getUser().equals(userService.getUserByPrincipal(principal))) {
+                        houseService.update(house, address, file, id);
+                    }
+
+                }
+
+
+            } catch (IOException e) {
+                System.out.println("Something wrong");
+            }
+            return "redirect:/houses";
+        }
     }
 
     // request form edit house by id
     @GetMapping("/{id}/edit")
     public String houseEdit(@PathVariable Long id, Model model, Principal principal) {
 
+        model.addAttribute("edit", " ");
         if (principal != null && houseService.getById(id).isPresent()) {
             if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)
                     || houseService.getHouseById(id).orElseThrow().getUser().equals(userService.getUserByPrincipal(principal))
@@ -187,6 +242,54 @@ public class HouseController {
         }
         return "house/house_detail";
     }
+
+
+    @PostMapping("/{houseId}/feedbacks")
+    public String houseDetailFeedback(
+              @PathVariable("houseId") Long houseId
+            , @Valid Feedback feedback
+            , BindingResult bindingResult
+            , Model model
+            , Principal principal
+    ) {
+
+
+            if (houseService.getById(houseId).isPresent()) {
+                House house = houseService.getById(houseId).get();
+                if (!orderHistoryService.findOrdersByHouseForFree(house).isEmpty()) {
+                    model.addAttribute("orders", orderHistoryService.findOrdersByHouseForFree(house));
+                }
+                model.addAttribute("house", house);
+                model.addAttribute("feedbacks", house.getFeedbackList());
+
+                if (principal != null) {
+                    if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
+                        model.addAttribute("admin", "admin");
+                    }
+                    model.addAttribute("user", userService.getUserByPrincipal(principal));
+                    model.addAttribute("isWishList", wishService.existsByHouseIdAndUser(houseId, principal));
+                }
+            }
+
+        if (bindingResult.hasErrors() ) {
+            Map<String, String> errorsMapHouse = bindingResult.getFieldErrors().stream().collect(
+                    Collectors.toMap(fieldError -> fieldError.getField() + "Error", FieldError::getDefaultMessage));
+
+            errorsMapHouse.forEach((k,v)-> System.out.println(k+v) );
+            model.mergeAttributes(errorsMapHouse);
+
+            return "house/house_detail";
+
+        }
+
+        feedbackService.saveToBase(feedback, houseId, principal);
+
+        return "house/house_detail";
+
+    }
+
+
+
 
     @PostMapping("/{houseId}/prebooking")
     public String hosePreBooking(

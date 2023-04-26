@@ -11,9 +11,13 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(value = "/users")
@@ -25,87 +29,167 @@ public class UserController {
     // request form new  user
     @GetMapping("/new")
     public String userNew(Model model) {
+        model.addAttribute("new", " ");
         model.addAttribute("user", null);
         return "user/user_form";
     }
 
     // create new User
-//    @PostMapping
-//    public String users(@Valid User user, BindingResult bindingResult, Model model) {
-//        if (bindingResult.hasErrors()) {
-//
-//        }
-//        if (!user.getPassword().equals(user.getPasswordConfirm())) {
-//            model.addAttribute("errorMessage", " ");
-//            model.addAttribute("errorMessagePass", "Паролі не співпадають");
-//            return "user/user_form";
-//        }
-//
-//        if (!userService.saveToBase(user)) {
-//            model.addAttribute("errorMessage", " ");
-//            model.addAttribute("errorMessageDouble", "Користувач з таким email вже існує");
-//            user.setEmail(null);
-//            model.addAttribute("user", user);
-//            return "user/user_form";
-//        }
-//
-//        return "redirect:/";
-//    }
-
     @PostMapping
-    public String users(@Valid User user, BindingResult bindingResult, Model model) {
-        if (bindingResult.hasErrors()) {
+    public String users(
+            @Valid User user
+            , BindingResult bindingResult
+            , Model model
+    ) {
+        model.addAttribute("new", " ");
+        if(bindingResult.hasErrors()) {
+            return getString(user, bindingResult, model);
+        } else {
 
-        }
-        if (!user.getPassword().equals(user.getPasswordConfirm())) {
-            model.addAttribute("errorMessage", " ");
-            model.addAttribute("errorMessagePass", "Паролі не співпадають");
-            return "user/user_form";
-        }
+            if (!user.getPassword().equals(user.getPasswordConfirm())) {
+                model.addAttribute("errorMessage", " ");
+                model.addAttribute("errorMessagePass", "Паролі не співпадають");
+                return "user/user_form";
+            }
 
-        if (!userService.saveToBase(user)) {
-            model.addAttribute("errorMessage", " ");
-            model.addAttribute("errorMessageDouble", "Користувач з таким email вже існує");
-            user.setEmail(null);
-            model.addAttribute("user", user);
-            return "user/user_form";
+            if (!userService.saveToBase(user)) {
+                model.addAttribute("errorMessage", " ");
+                model.addAttribute("errorMessageDouble", "Користувач з таким email вже існує");
+                model.addAttribute("user", user);
+                return "user/user_form";
+            }
         }
-
         return "redirect:/";
     }
 
 
     // update user
-    @PostMapping(value = {"/update", "/update/{id}"})
-    public String userUpdate(User user, Principal principal, @PathVariable(required = false) String id) {
+    @PostMapping(value = "/update")
+    public String userUpdate(
+            @Valid User user
+            , BindingResult bindingResult
+            , Model model
+            , Principal principal
+    ) {
 
-        if (userService.getUserByPrincipal(principal) != null) {
-            long userId = userService.getUserByPrincipal(principal).getId();
-            if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN) && id != null) {
-                userId = Long.parseLong(id);
+        model.addAttribute("edit", " ");
+        if (bindingResult.hasErrors()) {
+            return getString(user, bindingResult, model);
+        } else {
+            if (userService.getUserByPrincipal(principal) != null) {
+                long userId = userService.getUserByPrincipal(principal).getId();
+                if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
+                    model.addAttribute("admin", "admin");
+                }
+                //check is active
+                if (userService.getUserByPrincipal(principal).getActive()) {
+                    user.setActive(true);
+                } else {
+                    user.setActive(false);
+                }
+
+                if (user.getPasswordOld() != null && user.getPasswordOld().length() != 0
+                        && !userService.isTruePassword(userId, user.getPasswordOld())) {
+                    model.addAttribute("errorMessage", ".");
+                    model.addAttribute("errorMessagePassOld", "Діючий пароль не вірний");
+                    return "user/user_form";
+                }
+
+                if (!user.getPassword().equals(user.getPasswordConfirm())) {
+                    model.addAttribute("errorMessage", " ");
+                    model.addAttribute("errorMessagePass", "Паролі не співпадають");
+                    return "user/user_form";
+                }
+
+                userService.update(user, userId);
             }
+        }
+        return "redirect:/";
+    }
+
+
+
+
+
+    // update user for admin
+    @PostMapping(value = "/update/{id}")
+    public String userUpdate(
+            @Valid User user
+            , BindingResult bindingResult
+            , Model model
+            , Principal principal
+            , @PathVariable(required = false) String id
+    ) {
+        if (userService.getUserByPrincipal(principal) != null
+                && userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
+            long userId = Long.parseLong(id);
+            model.addAttribute("edit", " ");
+            model.addAttribute("idPresent", " ");
+            model.addAttribute("admin", "admin");
+            model.addAttribute("rolesEnum", Arrays.asList(Role.values()));
             //check is active
             if (user.getActiveForm() != null) {
                 user.setActive(true);
-            } else {user.setActive(false);}
+            } else {
+                user.setActive(false);
+            }
+            // check role
+            Set<Role> roles = userService.getById(userId).orElseThrow().getRoles();
+            user.setRoles(roles);
 
-            userService.update(user, userId);
+            if (bindingResult.hasErrors()) {
+                return getString(user, bindingResult, model);
+            } else {
+                    if (user.getPasswordOld() != null && user.getPasswordOld().length() != 0
+                            && !userService.isTruePassword(userId, user.getPasswordOld())) {
+                        model.addAttribute("errorMessage", " ");
+                        model.addAttribute("errorMessagePassOld", "Діючий пароль не вірний");
+                        return "user/user_form";
+                    }
+
+                    if (!user.getPassword().equals(user.getPasswordConfirm())) {
+                        model.addAttribute("errorMessage", " ");
+                        model.addAttribute("errorMessagePass", "Паролі не співпадають");
+
+                        return "user/user_form";
+                    }
+
+                    userService.update(user, userId);
+            }
         }
         return "redirect:/";
+    }
+
+
+    private String getString(@Valid User user, BindingResult bindingResult, Model model) {
+        Map<String, String> errorsMap = bindingResult.getFieldErrors().stream().collect(
+                Collectors.toMap(fieldError -> fieldError.getField() + "Error", FieldError::getDefaultMessage));
+
+        model.addAttribute("errorMessage", " ");
+        model.mergeAttributes(errorsMap);
+        model.addAttribute("user", user);
+        return "user/user_form";
     }
 
     // request form edit user by id
     @GetMapping(value = {"/edit", "/edit/{id}"})
     public String userEdit(Model model, Principal principal, @PathVariable(required = false) String id) {
+
         if (userService.getUserByPrincipal(principal) != null) {
+            User user;
+            model.addAttribute("edit", " ");
+
             if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN) && id != null) {
                 long userId = Long.parseLong(id);
-                model.addAttribute("user", userService.getById(userId).get());
+                user = userService.getById(userId).orElseThrow();
                 model.addAttribute("rolesEnum", Arrays.asList(Role.values()));
                 model.addAttribute("admin", "admin");
+                model.addAttribute("idPresent", " ");
             } else {
-                model.addAttribute("user", userService.getUserByPrincipal(principal));
+                user = userService.getUserByPrincipal(principal);
             }
+            user.setPasswordConfirm(user.getPassword());
+            model.addAttribute("user", user);
         }
         return "/user/user_form";
     }

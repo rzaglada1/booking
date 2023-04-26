@@ -42,7 +42,7 @@
                 <a href="/" class="h2 text-dark" style="margin-right: 20px"
                 >My booking.com</a
                 >
-                <#if user?? && user.email??>
+                <#if user?? && !errorMessage??>
                     <ul
                             class="nav col-12 col-lg-auto mb-2 justify-content-start align-items-center mb-md-0 float-md-end"
                     >
@@ -63,7 +63,7 @@
             </div>
 
             <div class="text-end">
-                <#if user?? && user.email??>
+                <#if user?? && !errorMessage??>
                     <a
                             href="/users/edit"
                             class="btn btn-outline-warning text-dark"

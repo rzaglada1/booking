@@ -6,12 +6,10 @@ import com.rzaglada1.booking.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -67,26 +65,31 @@ public class UserService {
 
 
 
-    public void update(User user, long userId) {
+    public boolean update(User user, long userId) {
+        boolean isAllOk = false;
         if (userRepository.findById(userId).isPresent()) {
             User userUpdate = userRepository.findById(userId).get();
             //update Role
             Set <Role> roleSet = userUpdate.getRoles();
-            roleSet.clear();
-            roleSet.add(user.getRoleForm());
-            userUpdate.setRoles(roleSet);
+
+            if (user.getRoleForm() != null) {
+                roleSet.clear();
+                roleSet.add(user.getRoleForm());
+                userUpdate.setRoles(roleSet);
+            }
 
             userUpdate.setFirstName(user.getFirstName());
             userUpdate.setLastName(user.getLastName());
             userUpdate.setPhone(user.getPhone());
             userUpdate.setActive(user.getActive());
-
-            if (isTruePassword(userId, user.getPasswordOld())) {
+            if (user.getPasswordOld() !=null && user.getPasswordOld().length() != 0 ) {
                 userUpdate.setPassword(passwordEncoder.encode(user.getPassword()));
             }
             userRepository.save(userUpdate);
+            isAllOk = true;
         }
 
+        return isAllOk;
     }
 
 
@@ -98,7 +101,7 @@ public class UserService {
         return user;
     }
 
-    private Boolean isTruePassword(Long id, String password) {
+    public Boolean isTruePassword(Long id, String password) {
         boolean isCheck = false;
         if (userRepository.findById(id).isPresent()) {
             isCheck = passwordEncoder.matches(password, userRepository.findById(id).get().getPassword());

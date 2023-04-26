@@ -8,7 +8,7 @@
 >
 
     <form method="post"
-          action="/houses<#if house??>/${house.id?c}</#if>" enctype="multipart/form-data" class="w-75">
+          action="/houses<#if house?? && edit??>/${house.id?c}</#if>" enctype="multipart/form-data" class="w-75">
 
 
         <div class="row">
@@ -19,7 +19,7 @@
                     <input
                             type="text"
                             maxlength="50"
-                            class="form-control"
+                            class="form-control <#if nameError??>is-invalid</#if>"
                             id="floatingName"
                             name="name"
                             placeholder="Назва"
@@ -28,6 +28,11 @@
                             </#if>
                     />
                     <label for="floatingName">Назва</label>
+                    <#if nameError??>
+                        <div class="invalid-feedback">
+                            ${nameError}
+                        </div>
+                    </#if>
                 </div>
 
                 <div class="form-group mb-2">
@@ -35,11 +40,19 @@
                     <textarea
                             maxlength="520"
                             rows="6"
-                            class="form-control"
+                            class="form-control <#if descriptionError??>is-invalid</#if>"
                             id="floatingDescription"
                             name="description"
                             placeholder="Опис житла"><#if house??>${house.description}</#if></textarea>
+
+                    <#if descriptionError??>
+                        <div class="invalid-feedback">
+                            ${descriptionError}
+                        </div>
+                    </#if>
+
                 </div>
+
 
                 <div class="form-check mb-2">
                     <input
@@ -49,7 +62,7 @@
                             name="isAvailableForm"
 
                             <#if house??>
-                                <#if house.isAvailable == true>checked</#if>
+                                <#if house.isAvailable?? && house.isAvailable == true>checked</#if>
                                 <#else>
                                 checked
                             </#if>
@@ -67,6 +80,8 @@
                             name="numTourists"
                             <#if house??>
                                 value="${house.numTourists}"
+                                <#else >
+                                value = 1
                             </#if>
                             placeholder="Кількість місць"
                     />
@@ -83,6 +98,8 @@
                             name="price"
                             <#if house??>
                                 value="${house.price?c}"
+                                <#else>
+                                value = 0
                             </#if>
                             placeholder="Ціна бронювання"
                     />
@@ -98,7 +115,7 @@
                     <input
                             type="text"
                             maxlength="50"
-                            class="form-control"
+                            class="form-control <#if countryError??>is-invalid</#if>"
                             id="floatingCountry1"
                             name="country"
                             <#if address.country??>
@@ -107,13 +124,18 @@
                             placeholder="Країна"
                     />
                     <label for="floatingCountry1">Країна</label>
+                    <#if countryError??>
+                        <div class="invalid-feedback">
+                            ${countryError}
+                        </div>
+                    </#if>
                 </div>
 
                 <div class="form-floating mb-2">
                     <input
                             type="text"
                             maxlength="50"
-                            class="form-control"
+                            class="form-control <#if cityError??>is-invalid</#if>"
                             id="floatingCity1"
                             name="city"
                             <#if address.city??>
@@ -122,6 +144,11 @@
                             placeholder="Місто"
                     />
                     <label for="floatingCity1">Місто</label>
+                    <#if cityError??>
+                        <div class="invalid-feedback">
+                            ${cityError}
+                        </div>
+                    </#if>
                 </div>
 
                 <div class="row">
@@ -130,13 +157,18 @@
                         <input
                                 type="text"
                                 maxlength="50"
-                                class="form-control"
+                                class="form-control <#if streetError??>is-invalid</#if>"
                                 name="street"
                                 <#if address.street??>
                                     value="${address.street}"
                                 </#if>
                                 placeholder="Вулиця"/>
                         <label for="floatingStreet1">Вулиця</label>
+                            <#if streetError??>
+                                <div class="invalid-feedback">
+                                    ${streetError}
+                                </div>
+                            </#if>
                         </div>
                     </div>
                     <div class="col">
@@ -144,7 +176,7 @@
                         <input
                                 type="text"
                                 maxlength="50"
-                                class="form-control"
+                                class="form-control <#if numberError??>is-invalid</#if>"
                                 name="number"
                                 <#if address.number??>
                                     value="${address.number}"
@@ -152,6 +184,11 @@
                                 placeholder="Будинок"
                         />
                             <label for="floatingNumber1">Будинок</label>
+                            <#if numberError??>
+                                <div class="invalid-feedback">
+                                    ${numberError}
+                                </div>
+                            </#if>
                         </div>
                     </div>
                     <div class="col">

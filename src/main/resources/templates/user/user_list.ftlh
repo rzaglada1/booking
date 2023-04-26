@@ -15,7 +15,7 @@
 
                         <div class="card-body d-flex flex-column">
 
-                            <form method="get" action="/users/edit/${userParam.id}" style="width: 400px">
+                            <form method="post" action="" style="width: 400px">
 
                                 <#if userParam??>
                                     <#list userParam.roles as role>
@@ -87,8 +87,10 @@
                                         <#if userParam.active>active<#else>not active</#if>
                                     </#if>
                                 </div>
-
-                                <button class="w-100 btn btn-lg btn-warning" type="submit">Деталі</button>
+                                <a   href="/users/edit/${userParam.id}"
+                                     class="w-100 btn btn-lg btn-warning">
+                                    Деталі
+                                </a>
 
                             </form>
 

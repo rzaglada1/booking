@@ -149,24 +149,30 @@
 
         <div class="container">
             <#if user??>
-                <form accept-charset="UTF-8" action="/feedbacks/${house.id}" method="post">
+                <form accept-charset="UTF-8" action="/houses/${house.id}/feedbacks" method="post">
             <textarea
-                    class="form-control animated"
+                    class="form-control animated <#if descriptionError??>is-invalid</#if>"
                     cols="50"
                     id="new-review"
                     name="description"
                     placeholder="Ваш відгук"
                     rows="5"
             ></textarea>
+                    <#if descriptionError??>
+                        <div class="invalid-feedback">
+                            ${descriptionError}
+                        </div>
+                    </#if>
 
                     <div class="text-right mt-2">
                         <input
                                 id="rating"
                                 name="rating"
-                                placeholder="0/10"
+                                placeholder="1/10"
                                 type="number"
+                                value=10
                                 step="1"
-                                min="0"
+                                min="1"
                                 max="10"
                         />
                         <button class="btn btn-warning btn-lg" type="submit">
@@ -177,6 +183,7 @@
             </#if>
             <hr/>
 
+            <div class=" border rounded position-relative" style="height: 400px; overflow-y: scroll">
             <#list feedbacks as feedback>
                 <div class="row lead rounded bg-white text-dark mt-4">
                     <div class="btn btn-secondary"><#if feedback.rating??>Оцінка ${feedback.rating}</#if>
@@ -186,7 +193,7 @@
                     <div class="text-start"><#if feedback.description??>${feedback.description}</#if></div>
                 </div>
             </#list>
-
+            </div>
         </div>
 
     </main>

@@ -47,15 +47,13 @@ public class User implements UserDetails {
 
     @Column(name = "password", length = 1000)
     @NotBlank(message = "Це поле не повинно бути порожнім")
-    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
+    @Length(max = 1000, message = "Довжина не повинна перевищувати 50 символів")
     private String password;
     @Transient
-    @NotBlank(message = "Це поле не повинно бути порожнім")
-    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
+    @Length(max = 1000, message = "Довжина не повинна перевищувати 50 символів")
     private String passwordConfirm;
     @Transient
-    @NotBlank(message = "Це поле не повинно бути порожнім")
-    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
+    @Length(max = 1000, message = "Довжина не повинна перевищувати 50 символів")
     private String passwordOld;
     @Transient
     private Role roleForm;
