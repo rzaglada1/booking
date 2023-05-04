@@ -23,7 +23,8 @@ public interface HouseRepository extends JpaRepository<House, Long> {
             "join Address a on h.id=a.house.id " +
             "left join OrderHistory o on h.id=o.house.id " +
             "WHERE " +
-            "h.numTourists >= :numTourist" +
+            "h.isAvailable = true " +
+            "and h.numTourists >= :numTourist" +
             " and a.country like concat('%', :country,'%')" +
             " and a.city like concat('%', :city,'%')" +
             " and h.id not in (" +
@@ -42,14 +43,12 @@ public interface HouseRepository extends JpaRepository<House, Long> {
     @Query("SELECT h FROM House h " +
             "WHERE " +
             "h.id = :idHouse" +
-            " and h.numTourists >= :numTourist" +
             " and h.id  in (" +
             "SELECT oo.house.id FROM OrderHistory oo WHERE not" +
             "(:endDateBooking < oo.dataBookingStart or  :startDateBooking >= oo.dataBookingEnd )) " +
             "")
     List<House> getHouseByDate (  @Param("startDateBooking")LocalDate startDateBooking,
                                   @Param("endDateBooking")LocalDate endDateBooking,
-                                  @Param("numTourist")int numTourist,
                                   @Param("idHouse")long idHouse
     );
 

@@ -37,9 +37,10 @@ public class HouseController {
     // request form all  house
 
     @GetMapping
-    public String houseAll(Model model
+    public String houseAll(
+              Model model
             , Principal principal
-            , @PageableDefault( sort = {"id"}, direction = Sort.Direction.ASC, size = 3, page = 0) Pageable pageable) {
+            , @PageableDefault( sort = {"id"}, direction = Sort.Direction.ASC, size = 3) Pageable pageable) {
 
         Page<House> housePage;
         if (principal != null) {
@@ -59,8 +60,6 @@ public class HouseController {
                 return "/message";
             }
         }
-
-
         return "house/house_list";
     }
 
@@ -71,17 +70,15 @@ public class HouseController {
         model.addAttribute("house", null);
         model.addAttribute("address", new Address());
         model.addAttribute("user", userService.getUserByPrincipal(principal));
-        if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
-            model.addAttribute("admin", "admin");
-        }
-
+        setModelAdmin(model,principal);
         return "house/house_form";
     }
 
 
     // create new house
     @PostMapping
-    public String house(@RequestParam(value = "file", required = false) MultipartFile file
+    public String house(
+              @RequestParam(value = "file", required = false) MultipartFile file
             , @Valid House house
             , BindingResult bindingResultHouse
             , @Valid Address address
@@ -91,48 +88,19 @@ public class HouseController {
     ) {
         model.addAttribute("new", " ");
         //check is active
-        if (house.getIsAvailableForm() != null) {
-            house.setIsAvailable(true);
-        } else {
-            house.setIsAvailable(false);
-        }
-
+        checkActive(house);
+        // check validError
         if (bindingResultHouse.hasErrors()  || bindingResultAddress.hasErrors()) {
-
-            return getString(house, address, bindingResultHouse, bindingResultAddress, model);
-        }
-
-
-        else {
+            setModelError(model, house, address, bindingResultHouse, bindingResultAddress);
+            return "house/house_form";
+        } else {
             try {
-
                 houseService.saveToBase(principal, house, address, file);
-
             } catch (IOException e) {
                 System.out.println("Something wrong");
             }
-
             return "redirect:/houses";
         }
-    }
-
-    private String getString(@Valid House house, @Valid Address address
-            , BindingResult bindingResultHouse, BindingResult bindingResultAddress, Model model) {
-        Map<String, String> errorsMapHouse = bindingResultHouse.getFieldErrors().stream().collect(
-                Collectors.toMap(fieldError -> fieldError.getField() + "Error", FieldError::getDefaultMessage));
-
-        Map<String, String> errorsMapAddress = bindingResultAddress.getFieldErrors().stream().collect(
-                Collectors.toMap(fieldError -> fieldError.getField() + "Error", FieldError::getDefaultMessage));
-
-        model.addAttribute("errorMessage", " ");
-        model.mergeAttributes(errorsMapHouse);
-        model.mergeAttributes(errorsMapAddress);
-        model.addAttribute("house", house);
-        model.addAttribute("address", address);
-
-        errorsMapHouse.forEach((k,v)-> System.out.println(k+v));
-        errorsMapAddress.forEach((k,v)-> System.out.println(k+v));
-        return "house/house_form";
     }
 
 
@@ -150,27 +118,16 @@ public class HouseController {
     ) {
         model.addAttribute("edit", " ");
         //check is active
-        if (house.getIsAvailableForm() != null) {
-            house.setIsAvailable(true);
-        } else {
-            house.setIsAvailable(false);
-        }
+        checkActive(house);
 
+        //check validError
         if (bindingResultHouse.hasErrors()  || bindingResultAddress.hasErrors()) {
-
-            return getString(house, address, bindingResultHouse, bindingResultAddress, model);
-        }
-
-
-        else {
+            setModelError(model, house, address, bindingResultHouse, bindingResultAddress);
+            return "house/house_form";
+        } else {
             try {
                 //check is active
-                if (house.getIsAvailableForm() != null) {
-                    house.setIsAvailable(true);
-                } else {
-                    house.setIsAvailable(false);
-                }
-
+                checkActive(house);
                 if (principal != null && houseService.getById(id).isPresent()) {
                     if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
                         houseService.update(house, address, file, id);
@@ -178,10 +135,7 @@ public class HouseController {
                     if (houseService.getHouseById(id).orElseThrow().getUser().equals(userService.getUserByPrincipal(principal))) {
                         houseService.update(house, address, file, id);
                     }
-
                 }
-
-
             } catch (IOException e) {
                 System.out.println("Something wrong");
             }
@@ -202,9 +156,7 @@ public class HouseController {
                 model.addAttribute("address", houseService.getById(id).get().getAddress());
                 model.addAttribute("user", userService.getUserByPrincipal(principal));
             }
-            if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
-                model.addAttribute("admin", "admin");
-            }
+            setModelAdmin(model,principal);
         }
         return "house/house_form";
     }
@@ -222,24 +174,13 @@ public class HouseController {
         return "redirect:/houses";
     }
 
+
+
+
+
     @GetMapping("/{houseId}/detail")
     public String houseDetail(@PathVariable("houseId") Long houseId, Model model, Principal principal) {
-        if (houseService.getById(houseId).isPresent()) {
-            House house = houseService.getById(houseId).get();
-            if (!orderHistoryService.findOrdersByHouseForFree(house).isEmpty()) {
-                model.addAttribute("orders", orderHistoryService.findOrdersByHouseForFree(house));
-            }
-            model.addAttribute("house", house);
-            model.addAttribute("feedbacks", house.getFeedbackList());
-
-            if (principal != null) {
-                if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
-                    model.addAttribute("admin", "admin");
-                }
-                model.addAttribute("user", userService.getUserByPrincipal(principal));
-                model.addAttribute("isWishList", wishService.existsByHouseIdAndUser(houseId, principal));
-            }
-        }
+        houseModel(model, principal, houseId);
         return "house/house_detail";
     }
 
@@ -252,65 +193,58 @@ public class HouseController {
             , Model model
             , Principal principal
     ) {
+        houseModel(model, principal, houseId);
 
-
-            if (houseService.getById(houseId).isPresent()) {
-                House house = houseService.getById(houseId).get();
-                if (!orderHistoryService.findOrdersByHouseForFree(house).isEmpty()) {
-                    model.addAttribute("orders", orderHistoryService.findOrdersByHouseForFree(house));
-                }
-                model.addAttribute("house", house);
-                model.addAttribute("feedbacks", house.getFeedbackList());
-
-                if (principal != null) {
-                    if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
-                        model.addAttribute("admin", "admin");
-                    }
-                    model.addAttribute("user", userService.getUserByPrincipal(principal));
-                    model.addAttribute("isWishList", wishService.existsByHouseIdAndUser(houseId, principal));
-                }
-            }
 
         if (bindingResult.hasErrors() ) {
-            Map<String, String> errorsMapHouse = bindingResult.getFieldErrors().stream().collect(
-                    Collectors.toMap(fieldError -> fieldError.getField() + "Error", FieldError::getDefaultMessage));
-
-            errorsMapHouse.forEach((k,v)-> System.out.println(k+v) );
+            Map<String, String> errorsMapHouse = mapErrors(bindingResult);
             model.mergeAttributes(errorsMapHouse);
-
             return "house/house_detail";
-
         }
-
         feedbackService.saveToBase(feedback, houseId, principal);
-
         return "house/house_detail";
-
     }
-
-
 
 
     @PostMapping("/{houseId}/prebooking")
     public String hosePreBooking(
-            @PathVariable("houseId") long houseId,
-            OrderHistory orderHistory,
-            Model model,
-            Principal principal) {
+            @PathVariable("houseId") long houseId
+            ,@Valid OrderHistory orderHistory
+            , BindingResult bindingResult
+            , Model model
+            , Principal principal) {
 
-        if (houseService.isDateFree(orderHistory, houseId)) {
-
-            House house = houseService.getHouseById(houseId).get();
-            orderHistory.setHouse(house);
-            model.addAttribute("house", house);
-            model.addAttribute("order", orderHistory);
-
-            return "/house/house_booking";
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errorsMap = mapErrors(bindingResult);
+            model.addAttribute("errorMessage", " ");
+            model.mergeAttributes(errorsMap);
+            model.addAttribute("orderHistory", orderHistory);
+            houseModel(model, principal, houseId);
+            return "house/house_detail";
         } else {
-            model.addAttribute("message", "На вказаний період вже заброньовано. Спробуйте інші дати");
-            return "/message";
+            orderHistory.setDataBookingEnd(orderHistory.getDataBookingStart().plusDays(orderHistory.getNumDaysBooking()));
+            House house = houseService.getHouseById(houseId).orElseThrow();
+            if (houseService.isDateFree(orderHistory, houseId) && house.getNumTourists() >= orderHistory.getNumTourists()) {
+                orderHistory.setHouse(house);
+                model.addAttribute("house", house);
+                model.addAttribute("order", orderHistory);
+
+                return "/house/house_booking";
+            } else {
+                String messageUrl = "/houses/" + houseId +"/detail";
+                if (house.getNumTourists() < orderHistory.getNumTourists()) {
+                    model.addAttribute("message", "Будинок не розрахований на таку кількість людей");
+                } else {
+                    model.addAttribute("message", "На вказаний період вже заброньовано. Спробуйте інші дати");
+                }
+                model.addAttribute("messageUrl", messageUrl );
+                return "/message";
+            }
+
         }
     }
+
+
 
     @PostMapping("/{houseId}/booking")
     public String hoseBooking(
@@ -332,5 +266,51 @@ public class HouseController {
 
     }
 
+
+    private Map<String, String> mapErrors (BindingResult bindingResult) {
+        return bindingResult.getFieldErrors().stream().collect(
+                Collectors.toMap(fieldError -> fieldError.getField() + "Error", FieldError::getDefaultMessage));
+    }
+
+
+    private void setModelError( Model model, House house, Address address,
+                                BindingResult bindingResultHouse, BindingResult bindingResultAddress) {
+        Map<String, String> errorsMapHouse = mapErrors(bindingResultHouse);
+        Map<String, String> errorsMapAddress = mapErrors(bindingResultAddress);
+        model.addAttribute("errorMessage", " ");
+        model.mergeAttributes(errorsMapHouse);
+        model.mergeAttributes(errorsMapAddress);
+        model.addAttribute("house", house);
+        model.addAttribute("address", address);
+    }
+
+    private void houseModel (Model model, Principal principal, long houseId) {
+        if (houseService.getById(houseId).isPresent()) {
+            House house = houseService.getById(houseId).get();
+            if (!orderHistoryService.findOrdersByHouseForFree(house).isEmpty()) {
+                model.addAttribute("orders", orderHistoryService.findOrdersByHouseForFree(house));
+            }
+            model.addAttribute("house", house);
+            model.addAttribute("feedbacks", house.getFeedbackList());
+
+            if (principal != null) {
+                if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
+                    model.addAttribute("admin", "admin");
+                }
+                model.addAttribute("user", userService.getUserByPrincipal(principal));
+                model.addAttribute("isWishList", wishService.existsByHouseIdAndUser(houseId, principal));
+            }
+        }
+    }
+
+    private void setModelAdmin (Model model, Principal principal) {
+        if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
+            model.addAttribute("admin", "admin");
+        }
+    }
+
+    private void checkActive (House house) {
+        house.setIsAvailable(house.getIsAvailableForm() != null);
+    }
 
 }

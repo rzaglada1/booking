@@ -109,7 +109,9 @@
                 <#if page.number == 0>
                     <a class="page-link" href="#">Попередня</a>
                 <#else >
-                    <a class="page-link" href="${url}&page=${page.number - 1}">Попередня</a>
+                    <form action="${url}page=${page.number - 1}" method="post">
+                        <input class="page-link"  type="submit" value="Попередня" />
+                    </form>
                 </#if>
             </li>
 
@@ -127,7 +129,9 @@
                 <#if page.number+1 == page.totalPages>
                     <a class="page-link" href="#">Наступна</a>
                 <#else >
-                    <a class="page-link" href="${url}&page=${page.number + 1}">Наступна</a>
+                    <form action="${url}page=${page.number + 1}" method="post">
+                        <input class="page-link"  type="submit" value="Наступна" />
+                    </form>
                 </#if>
             </li>
         </ul>

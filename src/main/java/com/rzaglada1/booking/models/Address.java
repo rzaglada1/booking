@@ -19,16 +19,16 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @NotBlank(message = "Це поле не повинно бути порожнім11")
+    @NotBlank(message = "Це поле не повинно бути порожнім")
     @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
     private String country;
-    @NotBlank(message = "Це поле не повинно бути порожнім22")
+    @NotBlank(message = "Це поле не повинно бути порожнім")
     @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
     private String city;
-    @NotBlank(message = "Це поле не повинно бути порожнім33")
+    @NotBlank(message = "Це поле не повинно бути порожнім")
     @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
     private String street;
-    @NotBlank(message = "Це поле не повинно бути порожнім44")
+    @NotBlank(message = "Це поле не повинно бути порожнім")
     @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
     private String number;
     private String apartment;

@@ -1,5 +1,7 @@
 package com.rzaglada1.booking.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +19,7 @@ public class Wish {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
 
-    private LocalDate wishDateBooking;
+//    private LocalDate wishDateBooking;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User user;
@@ -25,8 +27,6 @@ public class Wish {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private House house;
 
-
-    private String name;
 
     private LocalDateTime dateCreate;
 

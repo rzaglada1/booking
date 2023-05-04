@@ -1,5 +1,7 @@
 package com.rzaglada1.booking.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.rzaglada1.booking.models.enams.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -51,13 +53,17 @@ public class User implements UserDetails {
     private String password;
     @Transient
     @Length(max = 1000, message = "Довжина не повинна перевищувати 50 символів")
+    @JsonIgnore
     private String passwordConfirm;
     @Transient
     @Length(max = 1000, message = "Довжина не повинна перевищувати 50 символів")
+    @JsonIgnore
     private String passwordOld;
     @Transient
+    @JsonIgnore
     private Role roleForm;
     @Transient
+    @JsonIgnore
     private String activeForm;
 
     private Boolean active;
@@ -65,15 +71,20 @@ public class User implements UserDetails {
     private LocalDateTime dateCreate;
 
     @OneToMany ( mappedBy="user", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<OrderHistory> orderHistoryList;
 
+
     @OneToMany(mappedBy="user", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Feedback> feedbackList;
 
     @OneToMany(mappedBy="user", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Wish> wishList;
 
     @OneToMany(mappedBy="user", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<House> houseList;
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)

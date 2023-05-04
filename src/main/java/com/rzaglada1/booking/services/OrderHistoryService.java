@@ -34,8 +34,8 @@ public class OrderHistoryService {
 
     public List<OrderHistory> findOrdersByHouseForFree (House house) {
         return orderHistoryRepository.findOrderHistoriesByHouse(house).stream()
-                .filter (e->e.getDataBookingStart().isAfter(LocalDate.now() )
-                        || e.getDataBookingStart().equals(LocalDate.now()))
+                .filter (e->e.getDataBookingEnd().isAfter(LocalDate.now() )
+                        || e.getDataBookingEnd().equals(LocalDate.now()))
                 .sorted(Comparator.comparing(OrderHistory::getDataBookingStart))
                 .toList();
     }

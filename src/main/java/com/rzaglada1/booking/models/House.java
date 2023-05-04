@@ -1,5 +1,7 @@
 package com.rzaglada1.booking.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -28,7 +30,7 @@ public class House {
     private String name;
     @Column(columnDefinition = "text")
     @NotBlank(message = "Це поле не повинно бути порожнім")
-    @Length(max = 50, message = "Довжина не повинна перевищувати 1000 символів")
+    @Length(max = 1000, message = "Довжина не повинна перевищувати 1000 символів")
     private String description;
     @NotNull(message = "Це поле не повинно бути порожнім")
     @Min(value = 1, message = "кількість від 1")

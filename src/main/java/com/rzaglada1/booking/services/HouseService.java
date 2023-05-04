@@ -155,8 +155,7 @@ public class HouseService {
         LocalDate getDataBookingStart = orderHistory.getDataBookingStart();
         LocalDate getDataBookingEnd = orderHistory.getDataBookingEnd();
         int numTourist = orderHistory.getNumTourists();
-
         return repositoryHouse.
-                getHouseByDate(getDataBookingStart, getDataBookingEnd.minusDays(1), numTourist, houseId).size() == 0;
+                getHouseByDate(getDataBookingStart, getDataBookingEnd.minusDays(1), houseId).size() == 0;
     }
 }

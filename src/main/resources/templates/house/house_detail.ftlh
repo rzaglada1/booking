@@ -7,8 +7,8 @@
     >
         <div class="container py-4 my-4 mx-auto d-flex flex-column">
             <div class="header">
-                <div class="row justify-content-around">
-                    <div class="col-md-9 abc">
+                <div class="d-flex justify-content-around" style="gap: 415px">
+                    <div>
                         <h1>
                             <#if house??>
                                 ${house.name}
@@ -17,13 +17,34 @@
                             </#if>
                         </h1>
                     </div>
-                    <div
-                            class="btn btn-secondary d-flex justify-content-center align-items-center fs-3 col-md-1 text-right"
-                    >
-                        <#if house.getAverRating() == -1>без оцінок<#else>${house.getAverRating()}</#if>
+                    <div style="gap: 15px" class="d-flex justify-content-between">
+                        <form action="/wishes/${house.id}/new" method="post">
+                            <input type="submit" style="height: 58px" class="btn btn-info
+
+                                   <#if user??>
+                                   <#if isWishList == true>
+                                   disabled "
+                                   value="Вже в обраному"
+                            <#else>
+                                "
+                                value="Додати в обране"
+                            </#if>
+                            <#else>
+                                "
+                                value="Додати в обране"
+                            </#if>
+                            />
+                        </form>
+                        <div class="d-flex flex-column">
+                            <div
+                                    class="btn btn-secondary fs-3"
+                            >
+                                <#if house.getAverRating() == -1>без оцінок<#else>${house.getAverRating()}</#if>
+                            </div>
+                            <p class="text-right para">
+                                <#if house.getCountFeedback() != 0>На основі ${house.getCountFeedback()} відгуків</#if></p>
+                        </div>
                     </div>
-                    <p class="text-right para">
-                        <#if house.getCountFeedback() != 0>На основі ${house.getCountFeedback()} відгуків</#if></p>
                 </div>
             </div>
             <div class="container-body mt-4">
@@ -53,103 +74,94 @@
                                 <hr class="cardHr">
                             </li>
                         </ul>
-                        <div style="float: right; gap: 10px; margin-top: auto" class="d-flex align-items-center">
-                            <form action="/houses/${house.id}/prebooking" method="post">
-
-                                <div class="d-flex justify-content-center align-items-stretch" style="gap: 10px">
-                                    <div class="form-floating">
-                                        <input
-                                                type="date"
-                                                class="form-control"
-                                                id="dateBookingStart"
-                                                name="dataBookingStart"
-                                        />
-                                        <label class="text-dark" for="dateBookingStart"
-                                        >Дата заїзду</label>
-                                    </div>
-
-
-                                    <div class="form-floating">
-                                        <input
-                                                type="date"
-                                                class="form-control"
-                                                id="dateBookingEnd"
-                                                name="dataBookingEnd"
-                                        />
-                                        <label class="text-dark" for="dateBookingEnd"
-                                        >Дата виїзду</label
-                                        >
-                                    </div>
-                                    <div class="form-floating">
-                                        <input
-                                                type="number"
-                                                min="1"
-                                                class="form-control"
-                                                id="numTourists"
-                                                name="numTourists"
-                                                value="2"
-                                        />
-                                        <label class="text-dark" for="numTourist"
-                                        >Кількість людей</label
-                                        >
-                                    </div>
-                                    <div class="form-floating">
-                                        <input type="submit" class="btn btn-warning h-100" value="Бронювати">
-                                    </div>
-                                </div>
-                            </form>
-
-
-                            <form style="float: right; height: 58px" action="/wishes/${house.id}/new" method="post">
-                                <input type="submit" class="btn btn-info h-100
-
-                                   <#if user??>
-                                   <#if isWishList == true>
-                                   disabled "
-                                       value="Вже в обраному"
-                                <#else>
-                                    "
-                                    value="Додати в обране"
-                                </#if>
-                                <#else>
-                                    "
-                                    value="Додати в обране"
-                                </#if>
+                        <form class="w-100 d-flex justify-content-around align-items-stretch"
+                              style="margin-top: auto; gap: 10px"
+                              action="/houses/${house.id}/prebooking" method="post">
+                            <div class="form-floating">
+                                <input
+                                        type="date"
+                                        class="form-control <#if dataBookingStartError??>is-invalid</#if>"
+                                        id="dateBookingStart"
+                                        name="dataBookingStart"
+                                        <#if orderHistory?? && orderHistory.dataBookingStart??>
+                                            value="${orderHistory.dataBookingStart}"</#if>
                                 />
-                            </form>
-                        </div>
+                                <label class="text-dark" for="dateBookingStart">Дата заїзду</label>
+                                <#if dataBookingStartError??>
+                                    <div class="invalid-feedback">
+                                        ${dataBookingStartError}
+                                    </div>
+                                </#if>
+                            </div>
 
+
+                            <div class="form-floating">
+                                <input
+                                        type="number"
+                                        class="form-control <#if numDaysBookingError??>is-invalid</#if>"
+                                        id="numDaysBooking"
+                                        name="numDaysBooking"
+                                        <#if orderHistory?? && orderHistory.numDaysBooking??>
+                                            value="${orderHistory.numDaysBooking}"<#else>value="1"</#if>
+                                />
+                                <label class="text-dark" for="numDaysBooking">На скільки днів</label>
+                                <#if numDaysBookingError??>
+                                    <div class="invalid-feedback">
+                                        ${numDaysBookingError}
+                                    </div>
+                                </#if>
+                            </div>
+                            <div class="form-floating">
+                                <input
+                                        type="number"
+                                        class="form-control <#if numTouristsError??>is-invalid</#if>"
+                                        id="numTourists"
+                                        name="numTourists"
+                                        <#if orderHistory?? && orderHistory.numTourists??>
+                                            value="${orderHistory.numTourists}" <#else>value="2"</#if>
+                                />
+                                <label class="text-dark" for="numTourist">Кількість людей</label>
+                                <#if numTouristsError??>
+                                    <div class="invalid-feedback">
+                                        ${numTouristsError}
+                                    </div>
+                                </#if>
+                            </div>
+                            <div class="form-floating">
+                                <input type="submit" class="btn btn-warning" style="height: 58px" value="Бронювати">
+                            </div>
+                        </form>
                     </div>
-
-                </div>
-                <div class="row mt-5">
-                    <div class="col-md-5 border rounded position-relative" style="height: 200px; overflow-y: scroll">
-                        <ul style="padding-left: 0; ">
-                            <li class="mb-4" style="display: inline;font-weight: bold;">Календар доступності<br></li>
-                            <#if orders??>
-                                <#list orders as order>
-                                    <li style="display: inline;"> Заброньовано з: ${order.dataBookingStart}
-                                        до: ${order.dataBookingEnd}
+                    <div class="row mt-5">
+                        <div class="col-md-5 border rounded position-relative"
+                             style="height: 200px; overflow-y: scroll">
+                            <ul style="padding-left: 0; ">
+                                <li class="mb-4" style="display: inline;font-weight: bold;">Календар доступності<br>
+                                </li>
+                                <#if orders??>
+                                    <#list orders as order>
+                                        <li style="display: inline;"> Заброньовано з: ${order.dataBookingStart}
+                                            до: ${order.dataBookingEnd}
+                                            <hr class="cardHr">
+                                        </li>
+                                    </#list>
+                                <#else>
+                                    <li style="display: inline;">
+                                        всі дати доступні
                                         <hr class="cardHr">
                                     </li>
-                                </#list>
-                            <#else>
-                                <li style="display: inline;">
-                                    всі дати доступні
-                                    <hr class="cardHr">
-                                </li>
-                            </#if>
+                                </#if>
 
-                        </ul>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
 
-        <div class="container">
-            <#if user??>
-                <form accept-charset="UTF-8" action="/houses/${house.id}/feedbacks" method="post">
+            <div class="container">
+                <#if user??>
+                    <form accept-charset="UTF-8" action="/houses/${house.id}/feedbacks" method="post">
             <textarea
                     class="form-control animated <#if descriptionError??>is-invalid</#if>"
                     cols="50"
@@ -158,44 +170,44 @@
                     placeholder="Ваш відгук"
                     rows="5"
             ></textarea>
-                    <#if descriptionError??>
-                        <div class="invalid-feedback">
-                            ${descriptionError}
+                        <#if descriptionError??>
+                            <div class="invalid-feedback">
+                                ${descriptionError}
+                            </div>
+                        </#if>
+
+                        <div class="text-right mt-2">
+                            <input
+                                    id="rating"
+                                    name="rating"
+                                    placeholder="1/10"
+                                    type="number"
+                                    value=10
+                                    step="1"
+                                    min="1"
+                                    max="10"
+                            />
+                            <button class="btn btn-warning btn-lg" type="submit">
+                                Зберегти
+                            </button>
                         </div>
-                    </#if>
+                    </form>
+                </#if>
+                <hr/>
 
-                    <div class="text-right mt-2">
-                        <input
-                                id="rating"
-                                name="rating"
-                                placeholder="1/10"
-                                type="number"
-                                value=10
-                                step="1"
-                                min="1"
-                                max="10"
-                        />
-                        <button class="btn btn-warning btn-lg" type="submit">
-                            Зберегти
-                        </button>
-                    </div>
-                </form>
-            </#if>
-            <hr/>
+                <div class=" border rounded position-relative" style="height: 400px; overflow-y: scroll">
+                    <#list feedbacks as feedback>
+                        <div class="row lead rounded bg-white text-dark mt-4">
+                            <div class="btn btn-secondary"><#if feedback.rating??>Оцінка ${feedback.rating}</#if>
+                                від <#if feedback.user.firstName??>${feedback.user.firstName}</#if>
 
-            <div class=" border rounded position-relative" style="height: 400px; overflow-y: scroll">
-            <#list feedbacks as feedback>
-                <div class="row lead rounded bg-white text-dark mt-4">
-                    <div class="btn btn-secondary"><#if feedback.rating??>Оцінка ${feedback.rating}</#if>
-                        від <#if feedback.user.firstName??>${feedback.user.firstName}</#if>
-
-                    </div>
-                    <div class="text-start"><#if feedback.description??>${feedback.description}</#if></div>
+                            </div>
+                            <div class="text-start"><#if feedback.description??>${feedback.description}</#if></div>
+                        </div>
+                    </#list>
                 </div>
-            </#list>
             </div>
         </div>
-
     </main>
     <div>
 
