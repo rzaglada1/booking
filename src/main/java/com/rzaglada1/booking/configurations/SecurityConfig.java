@@ -29,7 +29,7 @@ public class SecurityConfig  {
 
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers( "/", "/find", "/images/*",
-                                "/houses/*/detail", "/users/new", "/users", "/api/users", "/api/users/*").permitAll()
+                                "/houses/*/detail", "/users/new", "/users").permitAll()
                         //.requestMatchers("/users").hasRole("ROLE_ADMIN")
                         .anyRequest().authenticated()
                         //.anyRequest().permitAll()
