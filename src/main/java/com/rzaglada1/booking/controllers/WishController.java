@@ -54,6 +54,7 @@ public class WishController {
             wishService.deleteFromBase(houseId,principal);
             model.addAttribute("page", wishService.getWishByUser(principal, pageable) );
             model.addAttribute("user", userService.getUserByPrincipal(principal));
+            model.addAttribute("url", "/wishes");
             if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
                 model.addAttribute("admin", "admin");
             }

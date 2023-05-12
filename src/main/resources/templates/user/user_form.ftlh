@@ -71,7 +71,7 @@
                     >
 
                     <a
-                            href="/logout"
+                            href="/auth/logout"
                             class="btn btn-outline-danger"
                             style="width: 70px"
                     >Вийти</a
@@ -82,7 +82,7 @@
                     </#if>
 
                 <#else>
-                    <a href="/login" class="btn btn-outline-dark me-2">Увійти</a>
+                    <a href="/auth/login" class="btn btn-outline-dark me-2">Увійти</a>
                     <a href="/users/new" class="btn btn-outline-warning text-dark"
                     >Створити акаунт</a
                     >
@@ -155,14 +155,14 @@
                 <#if edit??>
                     <div class="form-floating mb-2">
                         <input id="floatingPasswordIld" type="password" maxlength="50"
-                               class="form-control <#if errorMessagePassOld??>is-invalid</#if>"
+                               class="form-control <#if passwordOldError??>is-invalid</#if>"
                                placeholder="Password"
                                name="passwordOld">
 
                         <label for="floatingPasswordIld">For change, enter old password</label>
-                        <#if errorMessagePassOld??>
+                        <#if passwordOldError??>
                             <div class="invalid-feedback">
-                                ${errorMessagePassOld}
+                                ${passwordOldError}
                             </div>
                         </#if>
                     </div>
@@ -172,7 +172,7 @@
                                class="form-control <#if errorMessagePass?? || passwordError??>is-invalid</#if>"
                                placeholder="PasswordNew"
                                name="password"
-                                <#if user??>
+                                <#if user?? && user.password??>
                                     value="${user.password}"
                                 </#if>
                         >
@@ -191,7 +191,7 @@
                                placeholder="Password confirm"
 
                                name="passwordConfirm"
-                                <#if user??>
+                                <#if user?? && user.passwordConfirm??>
                                     value="${user.passwordConfirm}"
                                 </#if>
                         >

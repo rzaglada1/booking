@@ -30,43 +30,27 @@ public class User implements UserDetails {
 
 
     @Column(unique = true)
-    @Email(message = "Не вірний формат email")
-    @NotBlank(message = "Це поле не повинно бути порожнім")
-    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
     private String email;
-
-    @NotBlank(message = "Це поле не повинно бути порожнім")
-    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
     private String firstName;
-
-    @NotBlank(message = "Це поле не повинно бути порожнім")
-    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
     private String lastName;
-
-    @NotBlank(message = "Це поле не повинно бути порожнім")
-    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
     private String phone;
+    private Boolean active;
 
     @Column(name = "password", length = 1000)
-    @NotBlank(message = "Це поле не повинно бути порожнім")
-    @Length(max = 1000, message = "Довжина не повинна перевищувати 50 символів")
     private String password;
     @Transient
     @Length(max = 1000, message = "Довжина не повинна перевищувати 50 символів")
-    @JsonIgnore
+
     private String passwordConfirm;
     @Transient
     @Length(max = 1000, message = "Довжина не повинна перевищувати 50 символів")
-    @JsonIgnore
     private String passwordOld;
     @Transient
-    @JsonIgnore
     private Role roleForm;
     @Transient
-    @JsonIgnore
     private String activeForm;
 
-    private Boolean active;
+
 
     private LocalDateTime dateCreate;
 
@@ -106,8 +90,10 @@ public class User implements UserDetails {
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
                 ", password='" + password + '\'' +
-                ", dateCreate=" + dateCreate +
+                ", passwordOld='" + passwordOld + '\'' +
+                ", active=" + active +
                 ", role=" + roles +
+                ", roleForm=" + roleForm +
                 '}';
     }
 

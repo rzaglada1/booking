@@ -72,7 +72,7 @@
                     >
 
                     <a
-                            href="/logout"
+                            href="/auth/logout"
                             class="btn btn-outline-danger"
                             style="width: 70px"
                     >Вийти</a
@@ -83,7 +83,7 @@
                     </#if>
 
                 <#else>
-                    <a href="/login" class="btn btn-outline-dark me-2">Увійти</a>
+                    <a href="/auth/login" class="btn btn-outline-dark me-2">Увійти</a>
                     <a href="/users/new" class="btn btn-outline-warning text-dark"
                     >Створити акаунт</a
                     >

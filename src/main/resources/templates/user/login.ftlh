@@ -6,7 +6,7 @@
 
 
 <main class="text-center bg-dark d-flex justify-content-center align-items-center view">
-    <form method="post" action="/login" style="width: 400px">
+    <form method="post" action="/auth/login" style="width: 400px">
 
 
 
@@ -14,7 +14,7 @@
 
         <div class="form-floating mb-2">
             <input id ="floatingEmail" type="text" maxlength="50" class="form-control" placeholder="Email"
-                   name="username" >
+                   name="email" >
             <label for="floatingEmail">Email</label>
 
 
@@ -36,7 +36,7 @@
 
         <button class="w-100 btn btn-lg btn-warning" type="submit">Sign in</button>
 
-        <a href="users/new">Registration</a>
+        <a href="/users/new">Registration</a>
     </form>
 </main>
 
