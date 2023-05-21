@@ -135,7 +135,6 @@ public class UserService {
 
             if (userResponseEntity.getStatusCode().is2xxSuccessful() && userAuth != null) {
                 user = userResponseEntity.getBody();
-                System.out.println("user get body " + userResponseEntity.getBody());
             }
         } catch (HttpClientErrorException e) {
             System.out.println("error get param ");

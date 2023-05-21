@@ -45,7 +45,6 @@ public class AuthController {
                 token = "Bearer " + responseEntity.getBody().getAccessToken();
             }
             // token ======================
-            System.out.println(responseEntity.getBody().getAccessToken());
 
         } catch (HttpClientErrorException | NullPointerException e) {
             // if error validation

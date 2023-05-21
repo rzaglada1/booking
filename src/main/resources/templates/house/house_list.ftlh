@@ -38,11 +38,11 @@
 
                     <div class="d-flex flex-column btn-group text-center">
                         <a
-                                href="/houses/${house.id}/edit"
+                                href="/houses/${house.id?c}/edit"
                                 class="btn fw-bold btn-sm btn-warning text-dark mb-1 mx-5 py-2 rounded"
                         >Змінити</a>
                         <a
-                                href="/houses/${house.id}/delete"
+                                href="/houses/${house.id?c}/delete"
                                 class="btn fw-bold btn-sm btn-dark mb-3 mx-5 py-2 rounded"
                         >Видалити</a
                         >

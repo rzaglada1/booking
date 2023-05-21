@@ -1,6 +1,7 @@
 package com.rzaglada1.booking.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -24,26 +25,18 @@ public class House {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
 
-    @NotBlank(message = "Це поле не повинно бути порожнім")
-    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
     private String name;
-    @Column(columnDefinition = "text")
-    @NotBlank(message = "Це поле не повинно бути порожнім")
-    @Length(max = 1000, message = "Довжина не повинна перевищувати 1000 символів")
     private String description;
-    @NotNull(message = "Це поле не повинно бути порожнім")
-    @Min(value = 1, message = "кількість від 1")
-    @Max( value = 50, message = "кількість до 50")
     private int numTourists;
-//    @NotBlank(message = "Це поле не повинно бути порожнім")
-@Min(value = 0, message = "ціна від 0")
     private double price;
 
+    @JsonIgnore
+    private Long imageId;
+
     private Boolean isAvailable;
+
     @Transient
     private String isAvailableForm;
-
-
 
     private LocalDateTime dateCreate;
 
@@ -66,15 +59,15 @@ public class House {
     private List<OrderHistory> orderHistoryList;
 
 
-    public double getAverRating() {
-        return feedbackList.stream()
-                .mapToDouble(Feedback::getRating)
-                .average().orElse(-1);
-    }
+//    public double getAverRating() {
+//        return feedbackList.stream()
+//                .mapToDouble(Feedback::getRating)
+//                .average().orElse(-1);
+//    }
 
-    public int getCountFeedback() {
-        return feedbackList.size();
-    }
+//    public int getCountFeedback() {
+//        return feedbackList.size();
+//    }
 
     @PrePersist
     private void init () {
@@ -88,8 +81,13 @@ public class House {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", dateCreate=" + dateCreate +
-//                ", address=" + address + '\n' +
-//                ", feedback=" + feedbackList + '\n' +
+                ", address=" + address + '\n' +
+                ", image=" + image + '\n' +
+                ", imageId=" + imageId + '\n' +
+                ", user=" + user + '\n' +
+                ", feedback=" + feedbackList + '\n' +
+                ", wish=" + wishList + '\n' +
+                ", orderHistory=" + orderHistoryList + '\n' +
                 '}' +'\n';
     }
 }

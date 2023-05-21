@@ -60,7 +60,7 @@ public class HouseService {
         return repositoryHouse.findAll();
     }
 
-    private Image fileToImage(MultipartFile file, House house) throws IOException {
+    public Image fileToImage(MultipartFile file, House house) throws IOException {
         // set image
         Image image = new Image();
         image.setHouse(house);
@@ -69,6 +69,7 @@ public class HouseService {
         image.setContentType(file.getContentType());
         image.setSize(file.getSize());
         image.setPhotoToBytes(file.getBytes());
+        System.out.println(image);
 
         return image;
     }

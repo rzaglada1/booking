@@ -75,7 +75,7 @@
                     <input
                             type="number"
                             min="1"
-                            class="form-control"
+                            class="form-control <#if numTouristsError??>is-invalid</#if>"
                             id="numTourists"
                             name="numTourists"
                             <#if house??>
@@ -86,14 +86,19 @@
                             placeholder="Кількість місць"
                     />
                     <label for="numTourists">Кількість місць</label>
+                    <#if numTouristsError??>
+                        <div class="invalid-feedback">
+                            ${numTouristsError}
+                        </div>
+                    </#if>
                 </div>
 
                 <div class="form-floating mb-2">
                     <input
                             type="number"
-                            min="0"
+<#--                            min="0"-->
                             step="0.01"
-                            class="form-control"
+                            class="form-control <#if priceError??>is-invalid</#if>"
                             id="priceF"
                             name="price"
                             <#if house??>
@@ -104,6 +109,11 @@
                             placeholder="Ціна бронювання"
                     />
                     <label for="priceF">Ціна бронювання</label>
+                    <#if priceError??>
+                        <div class="invalid-feedback">
+                            ${priceError}
+                        </div>
+                    </#if>
                 </div>
 
             </div>
@@ -115,18 +125,18 @@
                     <input
                             type="text"
                             maxlength="50"
-                            class="form-control <#if countryError??>is-invalid</#if>"
+                            class="form-control <#if address\.countryError??>is-invalid</#if>"
                             id="floatingCountry1"
-                            name="country"
+                            name="address.country"
                             <#if address.country??>
                                 value="${address.country}"
                             </#if>
                             placeholder="Країна"
                     />
                     <label for="floatingCountry1">Країна</label>
-                    <#if countryError??>
+                    <#if address\.countryError??>
                         <div class="invalid-feedback">
-                            ${countryError}
+                            ${address\.countryError}
                         </div>
                     </#if>
                 </div>
@@ -135,18 +145,18 @@
                     <input
                             type="text"
                             maxlength="50"
-                            class="form-control <#if cityError??>is-invalid</#if>"
+                            class="form-control <#if address\.cityError??>is-invalid</#if>"
                             id="floatingCity1"
-                            name="city"
+                            name="address.city"
                             <#if address.city??>
                                 value="${address.city}"
                             </#if>
                             placeholder="Місто"
                     />
                     <label for="floatingCity1">Місто</label>
-                    <#if cityError??>
+                    <#if address\.cityError??>
                         <div class="invalid-feedback">
-                            ${cityError}
+                            ${address\.cityError}
                         </div>
                     </#if>
                 </div>
@@ -157,16 +167,16 @@
                         <input
                                 type="text"
                                 maxlength="50"
-                                class="form-control <#if streetError??>is-invalid</#if>"
-                                name="street"
+                                class="form-control <#if address\.streetError??>is-invalid</#if>"
+                                name="address.street"
                                 <#if address.street??>
                                     value="${address.street}"
                                 </#if>
                                 placeholder="Вулиця"/>
                         <label for="floatingStreet1">Вулиця</label>
-                            <#if streetError??>
+                            <#if address\.streetError??>
                                 <div class="invalid-feedback">
-                                    ${streetError}
+                                    ${address\.streetError}
                                 </div>
                             </#if>
                         </div>
@@ -176,17 +186,17 @@
                         <input
                                 type="text"
                                 maxlength="50"
-                                class="form-control <#if numberError??>is-invalid</#if>"
-                                name="number"
+                                class="form-control <#if address\.numberError??>is-invalid</#if>"
+                                name="address.number"
                                 <#if address.number??>
                                     value="${address.number}"
                                 </#if>
                                 placeholder="Будинок"
                         />
                             <label for="floatingNumber1">Будинок</label>
-                            <#if numberError??>
+                            <#if address\.numberError??>
                                 <div class="invalid-feedback">
-                                    ${numberError}
+                                    ${address\.numberError}
                                 </div>
                             </#if>
                         </div>
@@ -196,8 +206,8 @@
                         <input
                                 type="text"
                                 maxlength="50"
-                                class="form-control"
-                                name="apartment"
+                                class="form-control "
+                                name="address.apartment"
                                 <#if address.apartment??>
                                     value="${address.apartment}"
                                 </#if>
@@ -206,6 +216,13 @@
                             <label for="floatingApartment1">Квартира</label>
                         </div>
                     </div>
+                    <input
+                            type="hidden"
+                            maxlength="50"
+                            class="form-control "
+                            name="imageId"
+                            <#if house?? && house.imageId??>value="${house.imageId}"</#if>
+                    />
                 </div>
             </div>
 
@@ -213,14 +230,21 @@
 
             <div class="form-group">
                 <label for="file"><b>Фото</b></label>
+
                 <input name="file" type="file"
-                       accept=".png, .jpg, .jpeg" class="form-control">
+                       accept=".png, .jpg, .jpeg" class="form-control <#if image\.photoToBytesError??>is-invalid</#if>">
                 <#if house??>
-                    <#if house.image??>
-                    <img class="m-5" src="/images/${house.image.getId()}" alt="No photo">
+                    <#if house.imageId??>
+<#--                    <img class="m-5" src="/images/${house.image.getId()}" alt="No photo">-->
+                        <img class="m-5" src="/images/${house.imageId?c}"  alt="No photo">
                     <#else>
                     <img src="" alt="No photo">
                     </#if>
+                </#if>
+                <#if image\.photoToBytesError??>
+                    <div class="invalid-feedback">
+                        Please, select a photo
+                    </div>
                 </#if>
             </div>
 

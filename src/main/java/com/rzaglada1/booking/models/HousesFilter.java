@@ -18,17 +18,10 @@ import java.time.LocalDate;
 public class HousesFilter {
 
 
-    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
     private String country;
-    @Length(max = 50, message = "Довжина не повинна перевищувати 50 символів")
     private String city;
-    @FutureOrPresent(message = "Дата менша за поточну")
-    private LocalDate date;
-    @Min(value = 1, message = "кількість днів від 1")
-    @Max( value = 50, message = "кількість днів до 50")
+    private LocalDate date ;
     private Integer days;
-    @Min(value = 1, message = "кількість людей від 1")
-    @Max( value = 50, message = "кількість людей до 50")
-    private Integer people = 2;
+    private Integer people;
 
 }

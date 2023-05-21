@@ -39,10 +39,10 @@
                             <div
                                     class="btn btn-secondary fs-3"
                             >
-                                <#if house.getAverRating() == -1>без оцінок<#else>${house.getAverRating()}</#if>
+                                <#if averRating == -1>без оцінок<#else>${averRating}</#if>
                             </div>
                             <p class="text-right para">
-                                <#if house.getCountFeedback() != 0>На основі ${house.getCountFeedback()} відгуків</#if></p>
+                                <#if countFeedback != 0>На основі ${countFeedback} відгуків</#if></p>
                         </div>
                     </div>
                 </div>

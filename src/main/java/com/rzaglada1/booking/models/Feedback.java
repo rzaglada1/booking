@@ -26,13 +26,8 @@ public class Feedback {
 
     private String name;
     @Column(columnDefinition = "text")
-    @NotBlank(message = "Напишіть свій відгук")
-    @Length(max =2000, message = "Довжина не повинна перевищувати 2000 символів")
     private String description;
 
-    @NotNull(message = "Це поле не повинно бути порожнім")
-    @Min(value = 1, message = "оцінка від 1 до 10")
-    @Max( value = 10, message = "оцінка від 1 до 10")
     private double rating;
     private LocalDateTime dateCreate;
 
@@ -40,7 +35,6 @@ public class Feedback {
     private House house;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JsonIgnore
     private User user;
 
 

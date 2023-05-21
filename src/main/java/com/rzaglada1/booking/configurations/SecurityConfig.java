@@ -20,6 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig  {
 
     private final SecurityUserService securityUserService;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -29,9 +30,11 @@ public class SecurityConfig  {
 
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers( "/", "/find", "/images/*",
-                                "/houses/*/detail", "/users", "/auth/*", "/users/*/*", "/users/*").permitAll()
+                                "/houses/*/detail", "/users", "/auth/*", "/users/*/*", "/users/*",
+                                "/houses", "/houses/*", "/houses/*/*"
+                                ).permitAll()
                         //.requestMatchers("/users").hasRole("ROLE_ADMIN")
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                         //.anyRequest().permitAll()
 
                 )

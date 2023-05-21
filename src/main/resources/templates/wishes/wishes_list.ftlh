@@ -36,36 +36,47 @@
 
 
                             <form class="mt-auto productForm" action="">
-                                <div class="btn-group sizes w-100">
-                                    <input
-                                            class="btn-check"
-                                            type="radio"
-                                            id="scoreWord"
-                                            checked
-                                            disabled
-                                    />
-                                    <label class="btn btn-outline-secondary" for="scoreWord">
-                                        Середня оцінка
-                                    </label>
+<#--                                <div class="btn-group sizes w-100">-->
+<#--                                    <input-->
+<#--                                            class="btn-check"-->
+<#--                                            type="radio"-->
+<#--                                            id="scoreWord"-->
+<#--                                            checked-->
+<#--                                            disabled-->
+<#--                                    />-->
+<#--                                    <label class="btn btn-outline-secondary" for="scoreWord">-->
+<#--                                        Середня оцінка-->
+<#--                                    </label>-->
 
-                                    <input
-                                            class="btn-check"
-                                            type="radio"
-                                            id="score"
-                                            checked
-                                            disabled
-                                    />
-                                    <label class="btn btn-outline-secondary" for="score">
-                                        <#if wish.house.getAverRating() == -1>поки оцінок немає<#else>${wish.house.getAverRating()}</#if>
-                                    </label>
-                                </div>
-                                <div class="d-flex flex-column ">
-                                    <a href="/houses/${wish.house.id}/detail"
-                                    >
-                                        <#if wish.house.getCountFeedback() == 0>ваш відгук буде перший
-                                        <#else>${wish.house.getCountFeedback()} відгуків</#if>
-                                    </a>
-                                </div>
+<#--                                    <input-->
+<#--                                            class="btn-check"-->
+<#--                                            type="radio"-->
+<#--                                            id="score"-->
+<#--                                            checked-->
+<#--                                            disabled-->
+<#--                                    />-->
+<#--                                    <label class="btn btn-outline-secondary" for="score">-->
+<#--                                        <#if wish.house.feedbackList??>-->
+<#--                                            <#global average = 0>-->
+<#--                                            <#global count = 0>-->
+<#--                                            <#list wish.house.feedbackList as feedback>-->
+<#--                                                <#global count ++>-->
+<#--                                                <#global average += feedback.rating>-->
+<#--                                            </#list>-->
+
+<#--                                            ${average/count}-->
+<#--                                        <#else>-->
+<#--                                            поки оцінок немає-->
+<#--                                        </#if>-->
+<#--                                    </label>-->
+<#--                                </div>-->
+<#--                                <div class="d-flex flex-column ">-->
+<#--                                    <a href="/houses/${wish.house.id}/detail"-->
+<#--                                    >-->
+<#--                                        <#if wish.house.feedbackList??>${count} відгуків-->
+<#--                                        <#else>ваш відгук буде перший</#if>-->
+<#--                                    </a>-->
+<#--                                </div>-->
 
                                 <span class="d-flex align-items-center justify-content-between mt-2">
 

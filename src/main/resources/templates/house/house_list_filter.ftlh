@@ -56,14 +56,26 @@
                                             disabled
                                     />
                                     <label class="btn btn-outline-secondary" for="score">
-                                        <#if house.getAverRating() == -1>поки оцінок немає<#else>${house.getAverRating()}</#if>
+                                        <#if house.feedbackList??>
+                                            <#global average = 0>
+                                            <#global count = 0>
+                                        <#list house.feedbackList as feedback>
+                                             <#global count ++>
+                                             <#global average += feedback.rating>
+                                        </#list>
+                                            <#if count !=0>
+                                            ${average/count}
+                                                <#else>
+                                                    поки оцінок немає
+                                            </#if>
+                                        </#if>
                                     </label>
                                 </div>
                                 <div class="d-flex flex-column ">
                                     <a href="/houses/${house.id}/detail"
                                     >
-                                        <#if house.getCountFeedback() == 0>ваш відгук буде перший
-                                        <#else>${house.getCountFeedback()} відгуків</#if>
+                                        <#if count !=0>${count} відгуків
+                                        <#else>ваш відгук буде перший</#if>
                                     </a>
                                 </div>
 

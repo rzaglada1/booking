@@ -25,7 +25,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.util.*;
 
 @Controller
@@ -62,15 +61,11 @@ public class UserController {
         }
 
         try {
-
-            System.out.println("user new " + user);
             restTemplate.postForEntity(uri, user, User.class);
-            System.out.println("12121");
         } catch (HttpClientErrorException e) {
             // if error validation
             try {
                 Map<String, String> errorsMap = getMapError(e.getMessage());
-                System.out.println(errorsMap);
                 model.addAttribute("errorMessage", " ");
                 model.mergeAttributes(errorsMap);
                 model.addAttribute("user", user);
@@ -90,7 +85,6 @@ public class UserController {
             , Model model
             , @PathVariable(required = false) String id
     ) {
-        System.out.println("user before update " + user);
         Set<Role> roles = new HashSet<>();
         model.addAttribute("edit", " ");
 
@@ -207,7 +201,6 @@ public class UserController {
             HttpHeaders headers = userService.getHeaders(AuthController.token);
             HttpEntity<User> userEntity = new HttpEntity<>(headers);
             try {
-                System.out.println("uri " + uriUserDelete);
                 restTemplate.exchange(uriUserDelete, HttpMethod.DELETE, userEntity, User.class);
             } catch (HttpClientErrorException e) {
                 System.out.println(e.getMessage());

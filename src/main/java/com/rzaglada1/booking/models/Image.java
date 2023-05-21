@@ -1,11 +1,13 @@
 package com.rzaglada1.booking.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 @Data
 @AllArgsConstructor
@@ -24,6 +26,7 @@ public class Image {
     @Column(columnDefinition = "LONGBLOB")
     private byte[] photoToBytes;
 
+    @JsonIgnore
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private House house;
 
@@ -35,4 +38,17 @@ public class Image {
         dateCreate = LocalDateTime.now();
     }
 
+    @Override
+    public String toString() {
+        return "Image{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", fileName='" + fileName + '\'' +
+                ", size=" + size +
+                ", contentType='" + contentType + '\'' +
+//                ", photoToBytes=" + Arrays.toString(photoToBytes) +
+//                ", house=" + house +
+                ", dateCreate=" + dateCreate +
+                '}';
+    }
 }
