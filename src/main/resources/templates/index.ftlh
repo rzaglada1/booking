@@ -48,7 +48,7 @@
                     class="form-control no-border-radius <#if dateError??>is-invalid</#if>"
                     id="date"
                     name="date"
-                    <#if houseFilter?? && houseFilter.date != "1970-01-01">value="${houseFilter.date}"</#if>
+                    <#if houseFilter?? && houseFilter.date?? && houseFilter.date != "1970-01-01">value="${houseFilter.date}"</#if>
                     placeholder="На яку дату плануєте подорож?"
             />
             <label class="text-dark" for="date">На яку дату плануєте подорож?</label>
@@ -66,7 +66,7 @@
                     class="form-control no-border-radius <#if daysError??>is-invalid</#if>"
                     id="days"
                     name="days"
-                    <#if houseFilter??>value="${houseFilter.days}"</#if>
+                    <#if houseFilter?? && houseFilter.days??>value="${houseFilter.days}"</#if>
                     placeholder="На скільки днів?"
             />
             <label class="text-dark" for="days">На скільки днів?</label>
@@ -84,7 +84,7 @@
                     class="form-control no-border-radius <#if peopleError??>is-invalid</#if>"
                     id="people"
                     name="people"
-                    <#if houseFilter??>value="${houseFilter.people}"</#if>
+                    <#if houseFilter?? && houseFilter.people??>value="${houseFilter.people}"</#if>
                     placeholder="На скільки людей?"
             />
             <label class="text-dark" for="people">На скільки людей?</label>

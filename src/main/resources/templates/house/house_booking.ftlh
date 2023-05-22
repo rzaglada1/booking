@@ -72,7 +72,8 @@
 
                   </span>
                             <input type="hidden" name="dataBookingStart" value="${order.dataBookingStart}">
-                            <input type="hidden" name="dataBookingEnd" value="${order.dataBookingEnd}">
+<#--                            <input type="hidden" name="dataBookingEnd" value="${order.dataBookingEnd}">-->
+                            <input type="hidden" name="numDaysBooking" value="${order.numDaysBooking}">
                             <input type="hidden" name="numTourists" value="${order.numTourists}">
 
                             <div class="d-flex flex-column btn-group text-center">

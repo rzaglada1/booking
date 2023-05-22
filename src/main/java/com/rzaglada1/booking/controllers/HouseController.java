@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rzaglada1.booking.models.*;
 import com.rzaglada1.booking.models.enams.Role;
 import com.rzaglada1.booking.services.*;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
@@ -27,7 +26,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -308,16 +306,25 @@ public class HouseController {
             try {
                 ParameterizedTypeReference<House> responseType = new ParameterizedTypeReference<>() {
                 };
+
+                System.out.println("111");
+                System.out.println(userAuth);
+
                 ResponseEntity<House> result = restTemplate.exchange(
                         uriHousesId
                         , HttpMethod.GET
                         , new HttpEntity<>(headers)
                         , responseType
                 );
+                System.out.println("222");
                 House house = result.getBody();
                 setModelAdmin(model, userAuth);
                 model.addAttribute("house", house);
                 model.addAttribute("user", userAuth);
+
+                System.out.println(house);
+
+
             } catch (HttpClientErrorException e) {
                 e.printStackTrace();
             }
@@ -391,13 +398,9 @@ public class HouseController {
                 model.addAttribute("averRating", -1);
 
             }
-
-
         } else {
             return "redirect:/auth/login";
         }
-
-
         return "house/house_detail";
     }
 
@@ -439,82 +442,87 @@ public class HouseController {
 
 
 
-    @PostMapping("/{houseId}/prebooking")
+    @PostMapping({"/{houseId}/prebooking", "/{houseId}/{booking}"})
     public String hosePreBooking(
             @PathVariable("houseId") long houseId
-            , @Valid OrderHistory orderHistory
-            , BindingResult bindingResult
+            , @PathVariable(value = "booking", required = false) String booking
+            , OrderHistory orderHistory
             , Model model
-            , Principal principal) {
+             ) {
 
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errorsMap = mapErrors(bindingResult);
-            model.addAttribute("errorMessage", " ");
-            model.mergeAttributes(errorsMap);
-            model.addAttribute("orderHistory", orderHistory);
-
-            if (houseService.getById(houseId).isPresent()) {
-                House house = houseService.getById(houseId).get();
-                if (!orderHistoryService.findOrdersByHouseForFree(house).isEmpty()) {
-                    model.addAttribute("orders", orderHistoryService.findOrdersByHouseForFree(house));
-                }
-                model.addAttribute("house", house);
-                model.addAttribute("feedbacks", house.getFeedbackList());
-
-                if (principal != null) {
-                    if (userService.getUserByPrincipal(principal).getRoles().contains(Role.ROLE_ADMIN)) {
-                        model.addAttribute("admin", "admin");
-                    }
-                    model.addAttribute("user", userService.getUserByPrincipal(principal));
-                    model.addAttribute("isWishList", wishService.existsByHouseIdAndUser(houseId, principal));
-                }
-            }
+        String messageUrl = "/houses/" + houseId + "/detail";
+        String uriUserParam = "http://localhost:8079/users/param";
+        String uriPrebooking = "http://localhost:8079/orders/" + houseId + "/prebooking";
 
 
 
-            return "house/house_detail";
-        } else {
-            orderHistory.setDataBookingEnd(orderHistory.getDataBookingStart().plusDays(orderHistory.getNumDaysBooking()));
-            House house = houseService.getHouseById(houseId).orElseThrow();
-            if (houseService.isDateFree(orderHistory, houseId) && house.getNumTourists() >= orderHistory.getNumTourists()) {
-                orderHistory.setHouse(house);
-                model.addAttribute("house", house);
-                model.addAttribute("order", orderHistory);
-
-                return "/house/house_booking";
-            } else {
-                String messageUrl = "/houses/" + houseId + "/detail";
-                if (house.getNumTourists() < orderHistory.getNumTourists()) {
-                    model.addAttribute("message", "Будинок не розрахований на таку кількість людей");
-                } else {
-                    model.addAttribute("message", "На вказаний період вже заброньовано. Спробуйте інші дати");
-                }
-                model.addAttribute("messageUrl", messageUrl);
-                return "/message";
-            }
-
+        if (orderHistory.getDataBookingStart() == null ) {
+            return "redirect:" + messageUrl;
         }
-    }
 
+        if (AuthController.token != null) {
+            User userAuth = userService.getUserByToken(AuthController.token, uriUserParam);
 
-    @PostMapping("/{houseId}/booking")
-    public String hoseBooking(
-            @PathVariable("houseId") long houseId,
-            OrderHistory orderHistory,
-            Model model,
-            Principal principal) {
+            model.addAttribute("messageUrl", messageUrl);
+            model.addAttribute("user", userAuth);
+            setModelAdmin(model, userAuth);
 
-        if (houseService.getHouseById(houseId).isPresent() && principal != null) {
-            House house = houseService.getHouseById(houseId).get();
+            House house = new House();
+            house.setId(houseId);
+            LocalDate dataBookingEnd = orderHistory.getDataBookingStart().plusDays(orderHistory.getNumDaysBooking());
+            orderHistory.setDataBookingEnd(dataBookingEnd);
+            orderHistory.setUser(userAuth);
             orderHistory.setHouse(house);
-            orderHistoryService.saveToBase(orderHistory, houseId, principal);
-            model.addAttribute("message", "Заброньовано");
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = userService.getHeaders(AuthController.token);
+            HttpEntity<OrderHistory> historyEntity = new HttpEntity<>(orderHistory, headers);
+
+            try {
+
+
+                if (booking != null && booking.equals("booking")) {
+                    uriPrebooking = "http://localhost:8079/orders/" + houseId;
+                }
+
+                System.out.println("order  " + orderHistory);
+                System.out.println("booking " + booking);
+                System.out.println(uriPrebooking);
+
+                ResponseEntity<OrderHistory> response = restTemplate.exchange(uriPrebooking, HttpMethod.POST, historyEntity, OrderHistory.class);
+                OrderHistory orderHistoryResponse = response.getBody();
+
+                if (booking != null && booking.equals("booking")) {
+                    model.addAttribute("message", "Заброньовано");
+                    return "/message";
+                }
+
+                if (orderHistoryResponse == null) {
+                    model.addAttribute("message", "На вказаний період вже заброньовано. Або кількість людей не сумісна з будинком");
+                    return "/message";
+                }
+
+                model.addAttribute("house", orderHistoryResponse.getHouse());
+                model.addAttribute("order", orderHistoryResponse);
+            } catch (HttpClientErrorException e) {
+                // if error validation
+                try {
+                    if (booking != null && booking.equals("booking")) {
+                        model.addAttribute("message", "Щось пішло не так");
+                        return "/message";
+                    }
+                    Map<String, String> errorsMap = getMapError(e.getMessage());
+                    model.mergeAttributes(errorsMap);
+                    model.addAttribute("message", "Не вірно вказані критерії бронювання. Спробуйте їх змінити.");
+                return "/message";
+                } catch (IOException ex) {
+                    System.out.println(e.getMessage());
+                }
+            }
         } else {
-            model.addAttribute("message", "Щось пішло не так. Спробуйте знову.");
+            return "redirect:/auth/login";
         }
-
-        return "/message";
-
+        return "/house/house_booking";
     }
 
 

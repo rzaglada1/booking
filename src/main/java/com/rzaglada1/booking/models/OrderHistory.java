@@ -25,15 +25,9 @@ public class OrderHistory {
 
     private double price;
 
-    @NotNull(message = "Введіть дату початку")
-    @FutureOrPresent(message = "Дата менша за поточну")
     private LocalDate dataBookingStart ;
     private LocalDate dataBookingEnd ;
-    @Min(value = 1, message = "кількість днів від 1")
-    @Max( value = 50, message = "кількість днів до 50")
     private long numDaysBooking;
-    @Min(value = 1, message = "кількість людей від 1")
-    @Max( value = 50, message = "кількість людей до 50")
     private int numTourists;
 
 
