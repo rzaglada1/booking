@@ -16,16 +16,9 @@ public class HouseWithoutImage {
     private String description;
     private int numTourists;
     private double price;
-
     private Boolean isAvailable;
-
-
     private String isAvailableForm;
-
     private LocalDateTime dateCreate;
-
-
     private Address address;
-
 
 }
