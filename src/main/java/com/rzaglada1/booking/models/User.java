@@ -14,11 +14,9 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "users")
+
 public class User {
-    @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+
     private long id;
 
 
@@ -45,26 +43,19 @@ public class User {
 
     private LocalDateTime dateCreate;
 
-    @OneToMany ( mappedBy="user", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<OrderHistory> orderHistoryList;
 
 
-    @OneToMany(mappedBy="user", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Feedback> feedbackList;
 
-    @OneToMany(mappedBy="user", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Wish> wishList;
 
-    @OneToMany(mappedBy="user", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<House> houseList;
 
-    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
-    @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 
     @PrePersist

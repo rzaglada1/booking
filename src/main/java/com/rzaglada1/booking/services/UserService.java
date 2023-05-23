@@ -2,35 +2,17 @@ package com.rzaglada1.booking.services;
 
 import com.rzaglada1.booking.controllers.AuthController;
 import com.rzaglada1.booking.models.User;
-import com.rzaglada1.booking.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.security.Principal;
-
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
 
 
-    public boolean isEmpty () {
-        return userRepository.size() == 0;
-    }
-
-
-
-
-    public User getUserByPrincipal(Principal principal) {
-        User user = new User();
-        if (principal != null) {
-            user = userRepository.findByEmail(principal.getName());
-        }
-        return user;
-    }
 
     public HttpHeaders getHeaders(String token) {
         HttpHeaders headers = new HttpHeaders();

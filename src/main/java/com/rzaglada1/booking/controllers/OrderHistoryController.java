@@ -2,9 +2,7 @@ package com.rzaglada1.booking.controllers;
 
 import com.rzaglada1.booking.models.OrderHistory;
 import com.rzaglada1.booking.models.User;
-import com.rzaglada1.booking.models.Wish;
 import com.rzaglada1.booking.models.enams.Role;
-import com.rzaglada1.booking.services.OrderHistoryService;
 import com.rzaglada1.booking.services.PaginatedResponse;
 import com.rzaglada1.booking.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +28,6 @@ import java.security.Principal;
 @RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrderHistoryController {
-    private final OrderHistoryService orderHistoryService;
     private final UserService userService;
 
     @GetMapping

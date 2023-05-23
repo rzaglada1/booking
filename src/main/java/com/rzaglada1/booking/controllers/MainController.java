@@ -43,10 +43,6 @@ public class MainController {
     public String index(Model model) {
 
         housesFilterRemember = null;
-        //check not users
-        if (userService.isEmpty()) {
-            return "redirect:/users/new";
-        }
 
         if (AuthController.token != null) {
             User user = userService.getUserByToken(AuthController.token, AuthController.uriUserParam);
@@ -86,6 +82,7 @@ public class MainController {
         if (AuthController.token != null) {
             User userAuth = userService.getUserByToken(AuthController.token, uriUserParam);
             setModelAdmin(model, userAuth);
+            model.addAttribute("user", userAuth);
         }
 
         RestTemplate restTemplate = new RestTemplate();
@@ -104,6 +101,8 @@ public class MainController {
             );
 
             Page<House> housePage = result.getBody();
+
+
 
             model.addAttribute("houses", housePage);
             model.addAttribute("page", housePage);

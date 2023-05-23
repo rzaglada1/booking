@@ -13,11 +13,9 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "houses")
+
 public class House {
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+
     private long id;
 
     private String name;
@@ -35,22 +33,14 @@ public class House {
 
     private LocalDateTime dateCreate;
 
-    @OneToOne (optional=false, mappedBy="house", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     private Address address;
-
-    @OneToOne (optional=false, mappedBy="house", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     private Image image;
 
-    @OneToMany (mappedBy="house", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Feedback> feedbackList;
 
-    @OneToMany (mappedBy="house", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Wish> wishList;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User user;
 
-    @OneToMany (mappedBy="house", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderHistory> orderHistoryList;
 
 

@@ -11,11 +11,9 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "addresses")
+
 public class Address {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+
     private long id;
 
     private String country;
@@ -26,7 +24,7 @@ public class Address {
 
     private LocalDateTime dateCreate;
 
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
+
     private House house;
 
     @PrePersist

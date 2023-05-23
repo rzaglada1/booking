@@ -12,11 +12,9 @@ import java.time.temporal.ChronoUnit;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "OrderHistories")
+
 public class OrderHistory {
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+
     private long id;
 
     private double price;
@@ -29,10 +27,8 @@ public class OrderHistory {
 
     private LocalDateTime dateCreate;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private House house;
 
     @PrePersist

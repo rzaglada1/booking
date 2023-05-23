@@ -11,11 +11,8 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "images")
 public class Image {
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+
     private long id;
 
     private String name;
@@ -26,7 +23,6 @@ public class Image {
     private byte[] photoToBytes;
 
     @JsonIgnore
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
     private House house;
 
     private LocalDateTime dateCreate;

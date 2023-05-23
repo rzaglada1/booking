@@ -12,24 +12,18 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "feedbacks")
+
 public class Feedback {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+
     private long id;
 
     private String name;
-    @Column(columnDefinition = "text")
     private String description;
 
     private double rating;
     private LocalDateTime dateCreate;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private House house;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User user;
 
 

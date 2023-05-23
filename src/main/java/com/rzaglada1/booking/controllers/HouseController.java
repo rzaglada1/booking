@@ -5,7 +5,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rzaglada1.booking.models.*;
 import com.rzaglada1.booking.models.enams.Role;
-import com.rzaglada1.booking.services.*;
+import com.rzaglada1.booking.services.HouseService;
+import com.rzaglada1.booking.services.PaginatedResponse;
+import com.rzaglada1.booking.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
@@ -18,8 +20,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -28,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Controller
@@ -37,9 +36,6 @@ import java.util.stream.Collectors;
 public class HouseController {
     private final HouseService houseService;
     private final UserService userService;
-    private final WishService wishService;
-    private final OrderHistoryService orderHistoryService;
-    private final FeedbackService feedbackService;
 
 
     // request form all  house
@@ -75,9 +71,8 @@ public class HouseController {
                 model.addAttribute("houses", housePage);
                 model.addAttribute("page", housePage);
                 model.addAttribute("url", "/houses");
-
                 model.addAttribute("user", userAuth);
-                if (housePage.getTotalElements() == 0) {
+                if (housePage != null && housePage.getTotalElements() == 0) {
                     model.addAttribute("message", "Поки нічого не має.");
                     return "/message";
                 }
@@ -249,7 +244,10 @@ public class HouseController {
                 setModelAdmin(model, userAuth);
                 model.addAttribute("edit", " ");
                 model.addAttribute("house", house);
-                model.addAttribute("address", house.getAddress());
+                if (house != null) {
+                    model.addAttribute("address", house.getAddress());
+                }
+
                 model.addAttribute("user", userAuth);
 
             } catch (HttpClientErrorException e) {
@@ -265,7 +263,6 @@ public class HouseController {
 
     @GetMapping("/{id}/delete")
     public String houseDelete(@PathVariable("id") Long id) {
-        String uriUserParam = "http://localhost:8079/users/param";
         String uriHousesDelete = "http://localhost:8079/houses/delete/" + id;
 
         if (AuthController.token != null) {
@@ -307,23 +304,16 @@ public class HouseController {
                 ParameterizedTypeReference<House> responseType = new ParameterizedTypeReference<>() {
                 };
 
-                System.out.println("111");
-                System.out.println(userAuth);
-
                 ResponseEntity<House> result = restTemplate.exchange(
                         uriHousesId
                         , HttpMethod.GET
                         , new HttpEntity<>(headers)
                         , responseType
                 );
-                System.out.println("222");
                 House house = result.getBody();
                 setModelAdmin(model, userAuth);
                 model.addAttribute("house", house);
                 model.addAttribute("user", userAuth);
-
-                System.out.println(house);
-
 
             } catch (HttpClientErrorException e) {
                 e.printStackTrace();
@@ -362,9 +352,17 @@ public class HouseController {
                 List<Feedback> feedbackList = resultFeedback.getBody();
                 model.addAttribute("feedbacks", feedbackList);
 
-                int countFeedback = feedbackList.size();
-                double averRating = feedbackList.stream().mapToDouble(Feedback::getRating).average().orElseThrow();
-                model.addAttribute("averRating", averRating);
+                int countFeedback = 0;
+                if (feedbackList != null) {
+                    countFeedback = feedbackList.size();
+                }
+
+                if (feedbackList != null) {
+                    double averRating = feedbackList.stream().mapToDouble(Feedback::getRating).average().orElseThrow();
+                    model.addAttribute("averRating", averRating);
+                }
+
+
                 model.addAttribute("countFeedback", countFeedback);
             } catch (Exception  e) {
                 model.addAttribute("averRating", -1);
@@ -384,14 +382,15 @@ public class HouseController {
                 );
                 List<OrderHistory> orderHistoryList = resultOrderHistory.getBody();
 
-                List <OrderHistory> forCalendarFree = orderHistoryList.stream()
-                        .filter (e->e.getDataBookingEnd().isAfter(LocalDate.now() )
-                        || e.getDataBookingEnd().equals(LocalDate.now()))
-                        .sorted(Comparator.comparing(OrderHistory::getDataBookingStart))
-                        .toList();
-
-                if (!orderHistoryList.isEmpty()) {
-                    model.addAttribute("orders", forCalendarFree);
+                if (orderHistoryList != null) {
+                    List <OrderHistory> forCalendarFree = orderHistoryList.stream()
+                            .filter (e->e.getDataBookingEnd().isAfter(LocalDate.now() )
+                                    || e.getDataBookingEnd().equals(LocalDate.now()))
+                            .sorted(Comparator.comparing(OrderHistory::getDataBookingStart))
+                            .toList();
+                    if (!orderHistoryList.isEmpty()) {
+                        model.addAttribute("orders", forCalendarFree);
+                    }
                 }
 
             } catch (Exception  e) {
@@ -409,7 +408,6 @@ public class HouseController {
     public String houseDetailFeedback(
             @PathVariable("houseId") Long houseId
             , Feedback feedback
-            , Model model
     ) {
 
         String uriUserParam = "http://localhost:8079/users/param";
@@ -485,10 +483,6 @@ public class HouseController {
                     uriPrebooking = "http://localhost:8079/orders/" + houseId;
                 }
 
-                System.out.println("order  " + orderHistory);
-                System.out.println("booking " + booking);
-                System.out.println(uriPrebooking);
-
                 ResponseEntity<OrderHistory> response = restTemplate.exchange(uriPrebooking, HttpMethod.POST, historyEntity, OrderHistory.class);
                 OrderHistory orderHistoryResponse = response.getBody();
 
@@ -524,13 +518,6 @@ public class HouseController {
         }
         return "/house/house_booking";
     }
-
-
-    private Map<String, String> mapErrors(BindingResult bindingResult) {
-        return bindingResult.getFieldErrors().stream().collect(
-                Collectors.toMap(fieldError -> fieldError.getField() + "Error", FieldError::getDefaultMessage));
-    }
-
 
 
 

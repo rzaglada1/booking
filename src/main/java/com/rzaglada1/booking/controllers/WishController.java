@@ -1,13 +1,10 @@
 package com.rzaglada1.booking.controllers;
 
-import com.rzaglada1.booking.models.Feedback;
-import com.rzaglada1.booking.models.House;
 import com.rzaglada1.booking.models.User;
 import com.rzaglada1.booking.models.Wish;
 import com.rzaglada1.booking.models.enams.Role;
 import com.rzaglada1.booking.services.PaginatedResponse;
 import com.rzaglada1.booking.services.UserService;
-import com.rzaglada1.booking.services.WishService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
@@ -19,21 +16,17 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import java.io.IOException;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/wishes")
 @RequiredArgsConstructor
 public class WishController {
-    private final WishService wishService;
     private final UserService userService;
 
     @GetMapping()
