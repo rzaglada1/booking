@@ -32,6 +32,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    String uriUserParam = "http://localhost:8079/users/param";
 
 
     // request form new  user
@@ -51,7 +52,7 @@ public class UserController {
         user.setActive(true);
 
         model.addAttribute("new", " ");
-        String uri = "http://localhost:8079/users/new";
+        String uri = "http://localhost:8079/users";
 
         RestTemplate restTemplate = new RestTemplate();
         if (!user.getPassword().equals(user.getPasswordConfirm())) {
@@ -88,11 +89,13 @@ public class UserController {
         Set<Role> roles = new HashSet<>();
         model.addAttribute("edit", " ");
 
-        String uriUserParam = "http://localhost:8079/users/param";
-        String uriUpdate = "http://localhost:8079/users/update";
+        String uriUpdate = "http://localhost:8079/users/" + user.getId();
 
         if (AuthController.token != null) {
             User userAuth = userService.getUserByToken(AuthController.token, uriUserParam);
+            if (userAuth.getEmail() == null) {
+                return "redirect:/auth/login";
+            }
 
             if (userAuth.getRoles().contains(Role.ROLE_ADMIN) && id == null) {
                 roles.add(Role.ROLE_ADMIN);
@@ -116,7 +119,7 @@ public class UserController {
             }
 
             if (userAuth.getRoles().contains(Role.ROLE_ADMIN) && id != null) {
-                uriUpdate = "http://localhost:8079/users/update/" + id;
+                uriUpdate = "http://localhost:8079/users/" + id;
                 model.addAttribute("edit", " ");
                 model.addAttribute("idPresent", " ");
                 model.addAttribute("rolesEnum", Arrays.asList(Role.values()));
@@ -150,7 +153,7 @@ public class UserController {
                 }
             }
         } else {
-            return "redirect:/redirect:/auth/login";
+            return "redirect:/auth/login";
         }
         return "redirect:/";
     }
@@ -159,11 +162,13 @@ public class UserController {
     // request form edit user by id
     @GetMapping(value = {"/edit", "/edit/{id}"})
     public String userEdit(Model model, @PathVariable(required = false) String id) {
-
-        String uriUserParam = "http://localhost:8079/users/param";
         if (AuthController.token != null) {
             User user;
             User userAuth = userService.getUserByToken(AuthController.token, uriUserParam);
+            System.out.println(userAuth.getEmail());
+            if (userAuth.getEmail() == null) {
+                return "redirect:/auth/login";
+            }
             model.addAttribute("edit", " ");
 
             if (userAuth.getRoles().contains(Role.ROLE_ADMIN) && id != null) {
@@ -179,24 +184,17 @@ public class UserController {
             }
             user.setPasswordConfirm(user.getPassword());
             model.addAttribute("user", user);
+            model.addAttribute("idPresent", " ");
         }
         return "/user/user_form";
     }
 
     @GetMapping(value = {"/delete", "/delete/{id}"})
     public String userDelete(@PathVariable(required = false) String id) {
-
-        String uriUserParam = "http://localhost:8079/users/param";
-        String uriUserDelete = "http://localhost:8079/users/delete";
+        String uriUserDelete = "http://localhost:8079/users/" + id;
         String uriUserLogout = "http://localhost:8079/auth/logout";
 
         if (AuthController.token != null) {
-            User userAuth = userService.getUserByToken(AuthController.token, uriUserParam);
-
-            if (userAuth.getRoles().contains(Role.ROLE_ADMIN) && id != null) {
-                uriUserDelete = "http://localhost:8079/users/delete/" + id;
-            }
-
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = userService.getHeaders(AuthController.token);
             HttpEntity<User> userEntity = new HttpEntity<>(headers);
@@ -206,7 +204,7 @@ public class UserController {
                 System.out.println(e.getMessage());
             }
         } else {
-            return "redirect:/redirect:/auth/login";
+            return "redirect:/auth/login";
         }
         userService.userLogout(AuthController.token, uriUserLogout);
         return "redirect:/";
@@ -216,13 +214,13 @@ public class UserController {
 
     @GetMapping
     public String userList(Model model, @PageableDefault(size = 3) Pageable pageable) {
-
-        String uriUserParam = "http://localhost:8079/users/param";
         String uriUsers = "http://localhost:8079/users?page=" + pageable.getPageNumber();
 
         if (AuthController.token != null) {
             User userAuth = userService.getUserByToken(AuthController.token, uriUserParam);
-
+            if (userAuth.getEmail() == null) {
+                return "redirect:/auth/login";
+            }
             if (userAuth.getRoles().contains(Role.ROLE_ADMIN)) {
                 RestTemplate restTemplate = new RestTemplate();
                 HttpHeaders headers = userService.getHeaders(AuthController.token);
@@ -248,7 +246,7 @@ public class UserController {
                 }
             }
         } else {
-            return "redirect:/redirect:/auth/login";
+            return "redirect:/auth/login";
         }
         return "user/user_list";
     }

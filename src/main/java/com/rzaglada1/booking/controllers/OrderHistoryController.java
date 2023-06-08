@@ -29,20 +29,22 @@ import java.security.Principal;
 @RequiredArgsConstructor
 public class OrderHistoryController {
     private final UserService userService;
+    String uriUserParam = "http://localhost:8079/users/param";
 
     @GetMapping
     public String orders(
             Model model
             , @PageableDefault(size = 3, page = 0) Pageable pageable) {
 
-
-        String uriUserParam = "http://localhost:8079/users/param";
         String uriOrders = "http://localhost:8079/orders?page=" + pageable.getPageNumber();
 
 
         if (AuthController.token != null) {
             RestTemplate restTemplate = new RestTemplate();
             User userAuth = userService.getUserByToken(AuthController.token, uriUserParam);
+            if (userAuth.getEmail() == null) {
+                return "redirect:/auth/login";
+            }
             HttpHeaders headers = userService.getHeaders(AuthController.token);
             try {
                 ParameterizedTypeReference<PaginatedResponse<OrderHistory>> responseType = new ParameterizedTypeReference<>() {

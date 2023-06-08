@@ -132,34 +132,33 @@
                             </div>
                         </form>
                     </div>
-                    <div class="row mt-5">
-                        <div class="col-md-5 border rounded position-relative"
-                             style="height: 200px; overflow-y: scroll">
-                            <ul style="padding-left: 0; ">
-                                <li class="mb-4" style="display: inline;font-weight: bold;">Календар доступності<br>
-                                </li>
-                                <#if orders??>
-                                    <#list orders as order>
-                                        <li style="display: inline;"> Заброньовано з: ${order.dataBookingStart}
-                                            до: ${order.dataBookingEnd}
-                                            <hr class="cardHr">
-                                        </li>
-                                    </#list>
-                                <#else>
-                                    <li style="display: inline;">
-                                        всі дати доступні
+                </div>
+                <div class="row mt-5">
+                    <div class="col-md-5 d-flex justify-content-center" style="height: 200px">
+                        <ul class="border rounded" style="padding-left: 0;  overflow-y: scroll; width: 90%">
+                            <li class="mb-4" style="display: inline;font-weight: bold;">Календар доступності<br>
+                            </li>
+                            <#if orders??>
+                                <#list orders as order>
+                                    <li style="display: inline;"> Заброньовано з: ${order.dataBookingStart}
+                                        до: ${order.dataBookingEnd}
                                         <hr class="cardHr">
                                     </li>
-                                </#if>
+                                </#list>
+                            <#else>
+                                <li style="display: inline;">
+                                    всі дати доступні
+                                    <hr class="cardHr">
+                                </li>
+                            </#if>
 
-                            </ul>
-                        </div>
+                        </ul>
                     </div>
                 </div>
             </div>
 
 
-            <div class="container">
+            <div class="container mt-5">
                 <#if user??>
                     <form accept-charset="UTF-8" action="/houses/${house.id}/feedbacks" method="post">
             <textarea

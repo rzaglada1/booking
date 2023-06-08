@@ -23,9 +23,6 @@ public class AuthController {
     private final UserService userService;
 
 
-
-
-
     @GetMapping("/auth/login")
     public String login() {
         return "user/login";
@@ -45,13 +42,11 @@ public class AuthController {
                 token = "Bearer " + responseEntity.getBody().getAccessToken();
             }
             // token ======================
-
         } catch (HttpClientErrorException | NullPointerException e) {
             // if error validation
             model.addAttribute("errorMessage", "Не вірний пароль або користувач");
             return "user/login";
         }
-
         return "redirect:/";
     }
 

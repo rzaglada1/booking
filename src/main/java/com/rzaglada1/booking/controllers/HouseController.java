@@ -36,20 +36,20 @@ import java.util.*;
 public class HouseController {
     private final HouseService houseService;
     private final UserService userService;
+    String uriUserParam = "http://localhost:8079/users/param";
 
 
     // request form all  house
-
     @GetMapping
     public String houseList(
             Model model
             , @PageableDefault(sort = {"id"}, direction = Sort.Direction.ASC, size = 3) Pageable pageable) {
-
-        String uriUserParam = "http://localhost:8079/users/param";
         String uriHouses = "http://localhost:8079/houses?page=" + pageable.getPageNumber();
-
         if (AuthController.token != null) {
             User userAuth = userService.getUserByToken(AuthController.token, uriUserParam);
+            if (userAuth.getEmail() == null) {
+                return "redirect:/auth/login";
+            }
 
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = userService.getHeaders(AuthController.token);
@@ -65,7 +65,6 @@ public class HouseController {
                 );
 
                 Page<House> housePage = result.getBody();
-
                 setModelAdmin(model, userAuth);
 
                 model.addAttribute("houses", housePage);
@@ -90,16 +89,17 @@ public class HouseController {
     // request form new  house
     @GetMapping("/new")
     public String houseNew(Model model) {
-        String uriUserParam = "http://localhost:8079/users/param";
-
         if (AuthController.token != null) {
             User userAuth = userService.getUserByToken(AuthController.token, uriUserParam);
+            if (userAuth.getEmail() == null) {
+                return "redirect:/auth/login";
+            }
             model.addAttribute("house", null);
             model.addAttribute("address", new Address());
             model.addAttribute("user", userAuth);
             setModelAdmin(model, userAuth);
         } else {
-            return "redirect:/redirect:/auth/login";
+            return "redirect:/auth/login";
         }
         return "house/house_form";
     }
@@ -112,13 +112,14 @@ public class HouseController {
             , House house
             , Model model
     ) throws IOException {
-        String uriUserParam = "http://localhost:8079/users/param";
         String uriHouseNew = "http://localhost:8079/houses";
 
         house.setImage(houseService.fileToImage(file, house));
-
         if (AuthController.token != null) {
             User userAuth = userService.getUserByToken(AuthController.token, uriUserParam);
+            if (userAuth.getEmail() == null) {
+                return "redirect:/auth/login";
+            }
             model.addAttribute("new", " ");
             //check is active
             checkActive(house);
@@ -131,7 +132,6 @@ public class HouseController {
                 restTemplate.exchange(uriHouseNew, HttpMethod.POST, houseEntity, House.class);
             } catch (HttpClientErrorException e) {
                 // if error validation
-
                 try {
                     Map<String, String> errorsMap = getMapError(e.getMessage());
                     model.addAttribute("errorMessage", " ");
@@ -162,8 +162,6 @@ public class HouseController {
             , Model model
             , @PathVariable long id
     ) throws IOException {
-
-        String uriUserParam = "http://localhost:8079/users/param";
         String uriHouseUpdate = "http://localhost:8079/houses/" + id;
 
         if (file != null && file.getSize() !=0) {
@@ -174,6 +172,9 @@ public class HouseController {
 
         if (AuthController.token != null) {
             User userAuth = userService.getUserByToken(AuthController.token, uriUserParam);
+            if (userAuth.getEmail() == null) {
+                return "redirect:/auth/login";
+            }
             model.addAttribute("edit", " ");
             //check is active
             checkActive(house);
@@ -188,11 +189,13 @@ public class HouseController {
                 // if error validation
                 try {
                     Map<String, String> errorsMap = getMapError(e.getMessage());
+
                     model.addAttribute("errorMessage", " ");
                     model.mergeAttributes(errorsMap);
-
                     model.addAttribute("imageId", house.getImageId());
 
+                    setModelAdmin(model, userAuth);
+                    model.addAttribute("edit", " ");
                     model.addAttribute("user", userAuth);
                     model.addAttribute("house", house);
                     model.addAttribute("address", house.getAddress());
@@ -201,11 +204,9 @@ public class HouseController {
                     System.out.println(e.getMessage());
                 }
             }
-
         } else {
             return "redirect:/auth/login";
         }
-
         return "redirect:/houses";
     }
 
@@ -214,14 +215,13 @@ public class HouseController {
     // request form edit house by id
     @GetMapping("/{id}/edit")
     public String houseEdit(@PathVariable Long id, Model model) {
-
-        String uriUserParam = "http://localhost:8079/users/param";
         String uriHousesId = "http://localhost:8079/houses/" + id;
-
-
 
         if (AuthController.token != null) {
             User userAuth = userService.getUserByToken(AuthController.token, uriUserParam);
+            if (userAuth.getEmail() == null) {
+                return "redirect:/auth/login";
+            }
 
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = userService.getHeaders(AuthController.token);
@@ -247,9 +247,7 @@ public class HouseController {
                 if (house != null) {
                     model.addAttribute("address", house.getAddress());
                 }
-
                 model.addAttribute("user", userAuth);
-
             } catch (HttpClientErrorException e) {
                 e.printStackTrace();
             }
@@ -263,7 +261,7 @@ public class HouseController {
 
     @GetMapping("/{id}/delete")
     public String houseDelete(@PathVariable("id") Long id) {
-        String uriHousesDelete = "http://localhost:8079/houses/delete/" + id;
+        String uriHousesDelete = "http://localhost:8079/houses/" + id;
 
         if (AuthController.token != null) {
             RestTemplate restTemplate = new RestTemplate();
@@ -273,6 +271,7 @@ public class HouseController {
                 restTemplate.exchange(uriHousesDelete, HttpMethod.DELETE, userEntity, House.class);
             } catch (HttpClientErrorException e) {
                 System.out.println(e.getMessage());
+                return "redirect:/auth/login";
             }
         } else {
             return "redirect:/auth/login";
@@ -284,8 +283,6 @@ public class HouseController {
     @GetMapping("/{houseId}/detail")
     public String houseDetail(@PathVariable("houseId") Long houseId, Model model) {
 
-
-        String uriUserParam = "http://localhost:8079/users/param";
         String uriHousesId = "http://localhost:8079/houses/" + houseId;
         String uriWishByHousesId = "http://localhost:8079/wishes/" + houseId;
         String uriFeedbackByHousesId = "http://localhost:8079/feedbacks/" + houseId;
@@ -295,6 +292,9 @@ public class HouseController {
 
         if (AuthController.token != null) {
             User userAuth = userService.getUserByToken(AuthController.token, uriUserParam);
+            if (userAuth.getEmail() == null) {
+                return "redirect:/auth/login";
+            }
 
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = userService.getHeaders(AuthController.token);
@@ -362,7 +362,6 @@ public class HouseController {
                     model.addAttribute("averRating", averRating);
                 }
 
-
                 model.addAttribute("countFeedback", countFeedback);
             } catch (Exception  e) {
                 model.addAttribute("averRating", -1);
@@ -409,12 +408,13 @@ public class HouseController {
             @PathVariable("houseId") Long houseId
             , Feedback feedback
     ) {
-
-        String uriUserParam = "http://localhost:8079/users/param";
         String uriFeedbackNew = "http://localhost:8079/feedbacks/" + houseId;
 
         if (AuthController.token != null) {
             User userAuth = userService.getUserByToken(AuthController.token, uriUserParam);
+            if (userAuth.getEmail() == null) {
+                return "redirect:/auth/login";
+            }
 
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = userService.getHeaders(AuthController.token);
@@ -447,12 +447,8 @@ public class HouseController {
             , OrderHistory orderHistory
             , Model model
              ) {
-
         String messageUrl = "/houses/" + houseId + "/detail";
-        String uriUserParam = "http://localhost:8079/users/param";
         String uriPrebooking = "http://localhost:8079/orders/" + houseId + "/prebooking";
-
-
 
         if (orderHistory.getDataBookingStart() == null ) {
             return "redirect:" + messageUrl;
@@ -460,6 +456,9 @@ public class HouseController {
 
         if (AuthController.token != null) {
             User userAuth = userService.getUserByToken(AuthController.token, uriUserParam);
+            if (userAuth.getEmail() == null) {
+                return "redirect:/auth/login";
+            }
 
             model.addAttribute("messageUrl", messageUrl);
             model.addAttribute("user", userAuth);
@@ -477,8 +476,6 @@ public class HouseController {
             HttpEntity<OrderHistory> historyEntity = new HttpEntity<>(orderHistory, headers);
 
             try {
-
-
                 if (booking != null && booking.equals("booking")) {
                     uriPrebooking = "http://localhost:8079/orders/" + houseId;
                 }
@@ -518,8 +515,6 @@ public class HouseController {
         }
         return "/house/house_booking";
     }
-
-
 
     private void setModelAdmin(Model model, User authUser) {
         if (authUser.getRoles().contains(Role.ROLE_ADMIN)) {

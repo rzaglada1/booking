@@ -97,7 +97,8 @@
 
 
 
-            <form method="post" action="/users<#if edit??>/update</#if><#if idPresent?? && edit?? && admin??>/${user.id}</#if>
+<#--            <form method="post" action="/users<#if edit??>/update</#if><#if idPresent?? && edit?? && admin??>/${user.id}</#if>-->
+            <form method="post" action="/users<#if edit??>/update</#if><#if idPresent?? && edit??>/${user.id}</#if>
 
 " style="width: 400px">
 
@@ -320,7 +321,7 @@
                         type="submit"><#if edit??>Оновити<#else>Створити</#if></button>
 
                 <#if edit??>
-                    <a href="/users/delete<#if admin??>/${user.id}</#if>"
+                    <a href="/users/delete/${user.id}"
                        class="btn w-100  btn-lg btn-danger ">
                         Видалити
                     </a>

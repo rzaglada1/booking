@@ -23,8 +23,6 @@ public class HouseService {
         image.setContentType(file.getContentType());
         image.setSize(file.getSize());
         image.setPhotoToBytes(file.getBytes());
-        System.out.println(image);
-
         return image;
     }
 
